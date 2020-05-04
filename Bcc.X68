@@ -1,8 +1,10 @@
 *-----------------------------------------------------------
-* Title      :
-* Written by :
-* Date       :
-* Description:
+* Title      : Subroutine for Bcc Opcodes
+* Written by : Amman Nega
+* Date       : May 3, 2020
+* Description: Decodes a word and then prints out the type of
+* Bcc opcode that is being used, along with the label that it
+* will branch to.
 *-----------------------------------------------------------
     *ORG    $1000 starting address determined by the user
 branchType  EQU     $00
