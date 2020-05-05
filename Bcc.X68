@@ -18,10 +18,10 @@ START:                  ; first instruction of program
 
 * Put program code here
 
-    MOVE.W  D3,(SP)+  * move the word to the stack to analyze one byte at a time
+    MOVE.W  D3,-(SP)  * move the word to the stack to analyze one byte at a time
     
     * must remember to pop low order byte from stack before RTS
-    MOVE.B  -(SP),branchType  * store high order byte in variable branchType
+    MOVE.B  (SP)+,branchType  * store high order byte in variable branchType
     
     CMP.B   #$67,branchType * check if this is a BEQ opcode
     BEQ     EQUAL   * we know this is a BEQ opcode, can now print this in console
