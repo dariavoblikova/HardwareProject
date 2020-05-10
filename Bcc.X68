@@ -1,15 +1,12 @@
 *-----------------------------------------------------------
-* Title      : Subroutine for Bcc Opcodes
+* Title      : Decoding Branch Opcodes
 * Written by : Amman Nega
-* Date       : May 3, 2020
-* Description: Decodes a word and then prints out the type of
-* Bcc opcode that is being used, along with the label that it
-* will branch to.
+* Date       : May 9, 2020
+* Description: Decodes word to identify the type of branching operation
 *-----------------------------------------------------------
-    *ORG    $1000 starting address determined by the user
-branchType  EQU     $00
+*    ORG    $2000 starting address determined by the user
 
-START:                  ; first instruction of program
+BCC:                  ; first instruction of program
 
 * Enter this subroutine when we know we have a Branch instruction
 * that we want to decode. Assuming that a word was given to us
@@ -19,20 +16,22 @@ START:                  ; first instruction of program
 * Put program code here
 
     MOVE.W  D3,-(SP)  * move the word to the stack to analyze one byte at a time
+    MOVE.B  D3,D4     * move byte representing displacement into D4
+    CLR.W   D3        * clear the contents of D3
     
     * must remember to pop low order byte from stack before RTS
-    MOVE.B  (SP)+,branchType  * store high order byte in variable branchType
+    MOVE.B  (SP)+,D3  * store high order byte in variable branchType
     
-    CMP.B   #$67,branchType * check if this is a BEQ opcode
+    CMP.B   #$67,D3 * check if this is a BEQ opcode
     BEQ     EQUAL   * we know this is a BEQ opcode, can now print this in console
     
-    CMP.B   #$6F,branchType * check if this is a BLE opcode
+    CMP.B   #$6F,D3 * check if this is a BLE opcode
     BEQ     LESS    * we know this is a BLE opcde, can now print this in console
     
-    CMP.B   #$6E,branchType * check if this is a BGT opcode
+    CMP.B   #$6E,D3 * check if this is a BGT opcode
     BEQ     GREATER * we know this is a BEQ opcode, can now print this in console
     
-    CMP.B   #$60,branchType * check if this is a BRA opcode
+    CMP.B   #$60,D3 * check if this is a BRA opcode
     BEQ     ALWAYS  * we know this is a BRA opcode, can now print this in console
     
     BRA     INVALID * reach this point if condition bits are invalid
@@ -74,9 +73,4 @@ LESSEQUAL     DC.B    'BLE    ',0
 GREATERTHAN     DC.B    'BGT    ',0
 INV     DC.B    'Not a valid Bcc opcode',0
 
-    END    START        ; last line of source
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
+    END    BCC        ; last line of source
