@@ -1,37 +1,40 @@
 *-----------------------------------------------------------
 * Title      : Decoding Branch Opcodes
 * Written by : Amman Nega
-* Date       : May 9, 2020
+* Date       : May 10, 2020
 * Description: Decodes word to identify the type of branching operation
 *-----------------------------------------------------------
-*    ORG    $2000 starting address determined by the user
+
+CR      EQU     $0D
+LF      EQU     $0A
+
 
 BCC:                  ; first instruction of program
 
 * Enter this subroutine when we know we have a Branch instruction
 * that we want to decode. Assuming that a word was given to us
-* hexadecimal in data register 3. Based on this word, this subroutine
+* hexadecimal in data register 4. Based on this word, this subroutine
 * will print to console if this is a BEQ, BLE, BGT, or BRA opcode.
 
 * Put program code here
 
-    MOVE.W  D3,-(SP)  * move the word to the stack to analyze one byte at a time
-    MOVE.B  D3,D4     * move byte representing displacement into D4
-    CLR.W   D3        * clear the contents of D3
+    MOVE.W  D4,-(SP)  * move the word to the stack to analyze one byte at a time
+    MOVE.B  D4,D6     * move byte representing displacement into D4
+    CLR.W   D4        * clear the contents of D3
     
     * must remember to pop low order byte from stack before RTS
-    MOVE.B  (SP)+,D3  * store high order byte in variable branchType
+    MOVE.B  (SP)+,D4  * store high order byte in variable branchType
     
-    CMP.B   #$67,D3 * check if this is a BEQ opcode
+    CMP.B   #$67,D4 * check if this is a BEQ opcode
     BEQ     EQUAL   * we know this is a BEQ opcode, can now print this in console
     
-    CMP.B   #$6F,D3 * check if this is a BLE opcode
+    CMP.B   #$6F,D4 * check if this is a BLE opcode
     BEQ     LESS    * we know this is a BLE opcde, can now print this in console
     
-    CMP.B   #$6E,D3 * check if this is a BGT opcode
+    CMP.B   #$6E,D4 * check if this is a BGT opcode
     BEQ     GREATER * we know this is a BEQ opcode, can now print this in console
     
-    CMP.B   #$60,D3 * check if this is a BRA opcode
+    CMP.B   #$60,D4 * check if this is a BRA opcode
     BEQ     ALWAYS  * we know this is a BRA opcode, can now print this in console
     
     BRA     INVALID * reach this point if condition bits are invalid
@@ -51,33 +54,51 @@ LESS    LEA LESSEQUAL,A1
 * will print out that this is a greater than opcode              
 GREATER LEA GREATERTHAN,A1
         BRA PRINT
-
+        
+* will print out that this is a branch always opcode        
 ALWAYS  LEA BRANCH,A1
         BRA PRINT
-        
+
 PRINT   MOVE.B  #14,D0
         TRAP    #15
         BRA     DISPLACEMENT
         
-*TODO: pop least significant byte from stack and determine label from given displacement        
-DISPLACEMENT    CMP.B   #$00,D4
-        * BEQ   subroutine that gets next word from memory to find label we branch to (16-bit displacement)
-        CMP.B   #$FF,D4
-        * BEQ   subroutine that gets next two words from memory to find label we branch to (16-bit displacement)
-        * otherwise, calculate 8-bit dislacement, probably don't need another subroutine for this case 
+DISPLACEMENT MOVE.W  A0,D1   * move current mem address location to D1
+        ADDI.W  #$2,D1  * add 2 in hex to mem location in order to calculate displacement   
+        CMP.B   #$00,D6
+        BEQ   FINISH    * need to go back to main program, and grab next word from memory (16-bit displacement)
+        CMP.B   #$FF,D6
+        BEQ   FINISH    * need to go back to main program, and grab next two words from memory (32-bit displacement)
+        
+        * otherwise, calculate 8-bit dislacement
         * we assume that the memory location we are currently dissasembling was passed into A0
-        MOVE.W  A0,D5   * move current mem address location to D5
-        ADDI.W  #$2,D5  * add 2 in hex to mem location in order to calculate displacement
+        CMP.B   #$0,D6  * check if the displacement is positive or negative
+        BLT     NEG     * add FF to D4 for sign extension
+        BRA     DONE    * if D4 is positive, can just calculate displacement as is
 
-    RTS     *Return to subroutine here
+NEG     ADDI.W  #$FF00,D6   * make D4 sign extended
+        BRA     DONE    * branch to calculate displacement
+
+DONE    ADD.W   D6,D1   * calculate displacement and store result in D1
+        MOVE.B  #16,D2  * output displacement in base 16 (hexadecimal)
+        MOVE.B  #15,D0  * move trap task into D0
+        TRAP    #15     * outputs displacement to console
+        
+        LEA     NEWL,A1 * makes a new line for outputting next opcode
+        MOVE.B  #14,D0  * move trap task to D0
+        TRAP    #15     * output new line
+FINISH        
+        RTS     *Return to subroutine here
 
     SIMHALT             ; halt simulator
 
-* Put variables and constants here
-BRANCH     DC.B    'BRA    ',0
-EQ     DC.B    'BEQ    ',0
-LESSEQUAL     DC.B    'BLE    ',0
-GREATERTHAN     DC.B    'BGT    ',0
+* Strings representing opcodes
+BRANCH     DC.B    'BRA ',0
+EQ     DC.B    'BEQ ',0
+LESSEQUAL     DC.B    'BLE ',0
+GREATERTHAN     DC.B    'BGT ',0
 INV     DC.B    'Not a valid Bcc opcode',0
+NEWL    DC.B    '',CR,LF,0
 
     END    BCC        ; last line of source
+
