@@ -60,7 +60,11 @@ PRINT   MOVE.B  #14,D0
         BRA     DONE
         
 *TODO: pop least significant byte from stack and determine label from given displacement        
-DONE    
+DONE    CMP.B   #$00,D4
+        * BEQ   subroutine that gets next word from memory to find label we branch to (16-bit displacement)
+        CMP.B   #$FF,D4
+        * BEQ   subroutine that gets next two words from memory to find label we branch to (16-bit displacement)
+        * otherwise, calculate 8-bit dislacement, probably don't need another subroutine for this case 
 
     RTS     *Return to subroutine here
 
