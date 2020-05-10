@@ -57,14 +57,17 @@ ALWAYS  LEA BRANCH,A1
         
 PRINT   MOVE.B  #14,D0
         TRAP    #15
-        BRA     DONE
+        BRA     DISPLACEMENT
         
 *TODO: pop least significant byte from stack and determine label from given displacement        
-DONE    CMP.B   #$00,D4
+DISPLACEMENT    CMP.B   #$00,D4
         * BEQ   subroutine that gets next word from memory to find label we branch to (16-bit displacement)
         CMP.B   #$FF,D4
         * BEQ   subroutine that gets next two words from memory to find label we branch to (16-bit displacement)
         * otherwise, calculate 8-bit dislacement, probably don't need another subroutine for this case 
+        * we assume that the memory location we are currently dissasembling was passed into A0
+        MOVE.W  A0,D5   * move current mem address location to D5
+        ADDI.W  #$2,D5  * add 2 in hex to mem location in order to calculate displacement
 
     RTS     *Return to subroutine here
 
