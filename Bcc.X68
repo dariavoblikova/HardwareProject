@@ -16,7 +16,9 @@ BCC:                  ; first instruction of program
 * hexadecimal in data register 4. Based on this word, this subroutine
 * will print to console if this is a BEQ, BLE, BGT, or BRA opcode.
 
-* Put program code here
+* Parameters:
+* D4: contains word we will decode to specific Bcc opcode
+* D5: contains long representing current PC location
 
     MOVE.W  D4,-(SP)  * move the word to the stack to analyze one byte at a time
     MOVE.B  D4,D6     * move byte representing displacement into D4
@@ -63,30 +65,43 @@ PRINT   MOVE.B  #14,D0
         TRAP    #15
         BRA     DISPLACEMENT
         
-DISPLACEMENT MOVE.W  A0,D1   * move current mem address location to D1
+* we assume that the memory location we are currently dissasembling was passed into D5
+DISPLACEMENT MOVE.W  D5,D1   * move current mem address location to D1
         ADDI.W  #$2,D1  * add 2 in hex to mem location in order to calculate displacement   
         CMP.B   #$00,D6
-        BEQ   FINISH    * need to go back to main program, and grab next word from memory (16-bit displacement)
+        BEQ     SIXTEEN * need to calculate 16-bit displacement
         CMP.B   #$FF,D6
-        BEQ   FINISH    * need to go back to main program, and grab next two words from memory (32-bit displacement)
+        BEQ     THIRTYTWO    * need to go back to main program, and grab next two words from memory (32-bit displacement)
         
         * otherwise, calculate 8-bit dislacement
-        * we assume that the memory location we are currently dissasembling was passed into A0
         CMP.B   #$0,D6  * check if the displacement is positive or negative
         BLT     NEG     * add FF to D4 for sign extension
-        BRA     DONE    * if D4 is positive, can just calculate displacement as is
+        BRA     EIGHT    * if D4 is positive, can just calculate displacement as is
 
 NEG     ADDI.W  #$FF00,D6   * make D4 sign extended
-        BRA     DONE    * branch to calculate displacement
+        BRA     EIGHT    * branch to calculate displacement
 
-DONE    ADD.W   D6,D1   * calculate displacement and store result in D1
-        MOVE.B  #16,D2  * output displacement in base 16 (hexadecimal)
+EIGHT   ADD.W   D6,D1   * calculate displacement and store result in D1
+
+OUTPUT  MOVE.B  #16,D2  * output displacement in base 16 (hexadecimal)
         MOVE.B  #15,D0  * move trap task into D0
         TRAP    #15     * outputs displacement to console
         
         LEA     NEWL,A1 * makes a new line for outputting next opcode
         MOVE.B  #14,D0  * move trap task to D0
         TRAP    #15     * output new line
+        BRA     FINISH  * end subroutine once displacement is calculated
+        
+SIXTEEN MOVEA.L D5,A2   * stores memory location of PC in address register
+        ADD.W   #$2,A2  * increment memory location to look at next word
+        ADD.W   (A2),D1 * calculate 16-bit displacement 
+        BRA     OUTPUT  * output displacement to display
+        
+THIRTYTWO  MOVEA.L  D5,A2 * stores memory location of PC in address register
+        ADD.W   #$2,A2  * increment memory location to look at next long
+        ADD.L   (A2),D1 * calculate 32-bit displacement
+        BRA     OUTPUT  * output displacement to display
+
 FINISH        
         RTS     *Return to subroutine here
 
@@ -101,4 +116,5 @@ INV     DC.B    'Not a valid Bcc opcode',0
 NEWL    DC.B    '',CR,LF,0
 
     END    BCC        ; last line of source
+
 
