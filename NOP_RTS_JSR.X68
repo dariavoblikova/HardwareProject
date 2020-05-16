@@ -17,6 +17,9 @@ NOP_RTS_JSR:                  ; first instruction of program
 * Put program code here
     * MOVE.W  D4,-(SP)    * move the word to the stack to analyze one byte at a time
     * CLR.W   D4          * clear the contents of D4
+    
+    * THE FOUR LINES OF CODE BELOW AREN'T NECESSARY, we can assume we only JSR
+    * to this subroutine when we know the leftmost byte is 4E.
     MOVE.W  D4,D3       * copy word to D3
     AND.W   #$FF00,D3   * mask D3 to only read most significant byte
     CMP.W   #$4E00,D3   * check if this could be NOP, RTS, or JSR
