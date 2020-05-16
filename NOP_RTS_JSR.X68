@@ -76,7 +76,8 @@ INDIRECT    MOVE.B  D4,D3
             MOVE.B  #14,D0
             TRAP    #15
             BRA     DONE
-            
+
+* check if it's a word or long absolute addressing, or invalid
 ABSOLUTE    MOVE.B  D4,D3
             AND.B   #$07,D3
             CMP.B   #$00,D3
@@ -84,15 +85,18 @@ ABSOLUTE    MOVE.B  D4,D3
             CMP.B   #$01,D3
             BEQ     LONG
             BRA     INVALID
-            
+ 
+* grab next word from memory which is address we JSR to 
 WORD        MOVEA.L D5,A0 
             MOVE.W  (A0),D3
             BRA     ABS_PRINT            
 
+* grab next long from memory which is address we JSR to 
 LONG        MOVEA.L D5,A0 
             MOVE.L  (A0),D3
             BRA     ABS_PRINT
-            
+   
+* print opcode instruction with absolute address   
 ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
             MOVE.B  #14,D0
             TRAP    #15
