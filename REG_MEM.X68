@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
-* Title      :
-* Written by :
-* Date       :
-* Description:
+* Title      :  MOVEM Decoding for Register to Memory
+* Written by :  Amman Nega
+* Date       :  May 16, 2020
+* Description:  Decodes MOVEM opcode only for register to memory moving.
 *-----------------------------------------------------------
     ORG    $1000
 REG_MEM:                  ; first instruction of program
