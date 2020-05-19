@@ -5,10 +5,6 @@
 * Description: Decodes word to identify the type of branching operation
 *-----------------------------------------------------------
 
-CR      EQU     $0D
-LF      EQU     $0A
-
-
 BCC:                  ; first instruction of program
 
 * Enter this subroutine when we know we have a Branch instruction
@@ -115,6 +111,12 @@ GREATERTHAN     DC.B    'BGT ',0
 INV     DC.B    'Not a valid Bcc opcode',0
 NEWL    DC.B    '',CR,LF,0
 
-    END    BCC        ; last line of source
+    * END    BCC        ; last line of source
 
 
+
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
