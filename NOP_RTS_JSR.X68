@@ -17,9 +17,6 @@ NOP_RTS_JSR:                  ; first instruction of program
 * Put program code here
     * MOVE.W  D4,-(SP)    * move the word to the stack to analyze one byte at a time
     * CLR.W   D4          * clear the contents of D4
-    
-    * THE FOUR LINES OF CODE BELOW AREN'T NECESSARY, we can assume we only JSR
-    * to this subroutine when we know the leftmost byte is 4E.
     MOVE.W  D4,D3       * copy word to D3
     AND.W   #$FF00,D3   * mask D3 to only read most significant byte
     CMP.W   #$4E00,D3   * check if this could be NOP, RTS, or JSR
@@ -43,11 +40,13 @@ INVALID     LEA INV_M,A1
             BRA PRINT
 
 * will print out that this is an NOP opcode   
-NOP_CASE    LEA NOP_M,A1
+NOP_CASE    MOVE.B  #$2,D6  * store displacement in D6
+            LEA NOP_M,A1
             BRA PRINT
             
 * will print out that this is an RTS opcode   
-RTS_CASE    LEA RTS_M,A1
+RTS_CASE    MOVE.B  #$2,D6  * store displacement in D6
+            LEA RTS_M,A1
             BRA PRINT
 
 * finds effective address of JSR opcode, if valid at all            
@@ -60,7 +59,8 @@ JSR_CASE    MOVE.B  D4,D3
             BRA     INVALID
 
 * check for address register we are using for EA
-INDIRECT    MOVE.B  D4,D3
+INDIRECT    MOVE.B  #$2,D6  * store displacement in D6
+            MOVE.B  D4,D3
             AND.B   #$07,D3
             MOVE.B  D3,D1
             
@@ -79,8 +79,7 @@ INDIRECT    MOVE.B  D4,D3
             MOVE.B  #14,D0
             TRAP    #15
             BRA     DONE
-
-* check if it's a word or long absolute addressing, or invalid
+            
 ABSOLUTE    MOVE.B  D4,D3
             AND.B   #$07,D3
             CMP.B   #$00,D3
@@ -88,18 +87,17 @@ ABSOLUTE    MOVE.B  D4,D3
             CMP.B   #$01,D3
             BEQ     LONG
             BRA     INVALID
- 
-* grab next word from memory which is address we JSR to 
-WORD        MOVEA.L D5,A0 
+            
+WORD        MOVE.B  #$4,D6  * store displacement in D6
+            MOVEA.L D5,A0 
             MOVE.W  (A0),D3
             BRA     ABS_PRINT            
 
-* grab next long from memory which is address we JSR to 
-LONG        MOVEA.L D5,A0 
+LONG        MOVE.B  #$6,D6  * store displacement in D6
+            MOVEA.L D5,A0 
             MOVE.L  (A0),D3
             BRA     ABS_PRINT
-   
-* print opcode instruction with absolute address   
+            
 ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
             MOVE.B  #14,D0
             TRAP    #15
@@ -130,6 +128,7 @@ HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
     END    NOP_RTS_JSR        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
