@@ -2,7 +2,10 @@
 * Title      :
 * Written by :
 * Date       :
-* Description:
+* Description: This code asks the user for a 32-bit memory address
+* location to represent a starting memory address. The long value
+* will be stored in D5 and will be used by the main routine to start
+* reading from memory and decoding opcodes.
 *-----------------------------------------------------------
 CR      EQU     $0D
 LF      EQU     $0A
@@ -11,7 +14,14 @@ ex      DS.B    $00
 
 IO                  ; first instruction of program
 
-* Put program code here
+* Stores 32-bit long value in D5 representing starting memory address.
+* Assumptions: Hexadecimal values A-F must be capitalized, lowercase
+* letters result in an invalid message and asks the user to input again.
+
+*TODO: Validate starting memory address, (it's within appropriate range,
+* and the value is even)
+*TODO: Ask for ending address and perform similar validation checks, along
+* with making sure ending address doesn't come before starting address.
         LEA MESSAGE,A1  * Loads string into A1
         MOVE.B  #14,D0  * Stores our trap task in D0
         TRAP    #15     * Performs trap task 14, reading string from A1
