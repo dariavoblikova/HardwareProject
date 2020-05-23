@@ -92,7 +92,7 @@ OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console
         
 SIXTEEN ADDI.L  #$2,D5  
         CMP.L   A6,D5   * check if displacement word is out of bounds of memory we read
-        BGT     INVALID
+        BGE     INVALID
         MOVEA.L D5,A2   * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next word
         ADD.W   (A2),D1 * calculate 16-bit displacement 
@@ -100,7 +100,7 @@ SIXTEEN ADDI.L  #$2,D5
         
 THIRTYTWO   ADDI.L  #$4,D5
         CMP.L   A6,D5
-        BGT     INVALID  
+        BGE     INVALID  
         MOVEA.L  D5,A2 * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next long
         ADD.L   (A2),D1 * calculate 32-bit displacement
