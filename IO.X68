@@ -24,7 +24,7 @@ IO                  ; first instruction of program
 * with making sure ending address doesn't come before starting address.
 GET_ADDRESS_IO
                     MOVEM.L     D0-D4/D6-D7/A0-A6, -(SP)    * Enter subroutine. Saving all the registers(except D5) to the stack        
-                    LEA         MESSAGE,A1                  * Loads string into A1
+                    LEA         InpStartAddrMess,A1         * Loads string into A1
                     MOVE.B      #14,D0                      * Stores our trap task in D0
                     TRAP        #15                         * Performs trap task 14, reading string from A1
                     MOVEA       #$6000,A2
@@ -86,11 +86,12 @@ DONE                MOVE.L      -(A2),D5
      * SIMHALT             ; halt simulator
 
 * Put variables and constants here
-MESSAGE             DC.B    'Input a starting address location: ',0
-INV_HEX_MESSAGE     DC.B    'Not a hex digit.',CR,LF,0
+
 * NEWL    DC.B    '',CR,LF,0
 
      * END         IO   ; last line of source
+
+
 
 
 

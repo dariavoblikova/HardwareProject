@@ -4,11 +4,6 @@
 * Date       : 5/18/2020
 * Description: Prompt user for a starting and ending address in memory
 *-----------------------------------------------------------
-* GET_STARTING_AND_ENDING:
-    * MOVEM.L     D0-D7/A0-A6, -(SP)          Push(save) registers  THINK WHICH REGISTERES TO SAVE?
-    * JSR         GET_ADDRESS_IO                                * NOT IMPLEMENTED YET
-    * MOVEM.L     (SP)+, D0-D7/A0-A6          Pop(restore) registers  SHOULD BE SAME AS PUSH!
-    * RTS
 
 FINISH_MESSAGE:
     MOVEM.L     D0/D1/D2/A1, -(SP)          Push(save) registers
@@ -39,9 +34,8 @@ NULL    EQU 00
 CR      EQU $0D                             ;ASCII code for Carriage Return
 LF      EQU $0A                             ;ASCII code for Line Feed
 * Put variables and constants here
-InputStartingAddressMessage         DC.B    'Enter an 8-digit starting address(even and in hex)',CR,LF,0
-InputEndingAddressMessage           DC.B    'Enter an 8-digit ending address(even and in hex)',CR,LF,0
-FinishQuestionString                DC.B    'To finish type 1', CR,LF,0
+
+
 
 
 
