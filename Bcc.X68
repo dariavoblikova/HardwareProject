@@ -101,7 +101,7 @@ THIRTYTWO  MOVEA.L  D5,A2 * stores memory location of PC in address register
 FINISH        
         RTS     *Return to subroutine here
 
-    SIMHALT             ; halt simulator
+    * SIMHALT             ; halt simulator
 
 * Strings representing opcodes
 BRANCH     DC.B    'BRA ',0
@@ -112,6 +112,7 @@ INV     DC.B    'Not a valid Bcc opcode',0
 NEWL    DC.B    '',CR,LF,0
 
     * END    BCC        ; last line of source
+
 
 
 
