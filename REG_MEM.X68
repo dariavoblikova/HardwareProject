@@ -56,6 +56,8 @@ PRE_DEC MOVE.B  D4,D3
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         CLR     D4
+        LEA     INDIRECT,A2
+        LEA     END_PAREN,A3
         BRA     DATA_RANGE   
 
 * find out range of data registers we are moving to memory        
@@ -125,7 +127,7 @@ SUB_DATAVALUE   MOVE.B  #14,D0
         BRA     DATA_RANGE       
         
 ADDR_RANGE    CMP.L    #$0000,D3
-        BEQ PRINTPRE
+        BEQ PRINT
         
         * we compare the register range with each possible value
         * and display the register in the output
@@ -379,20 +381,6 @@ SUB_DVALUE   MOVE.B  #14,D0
         TRAP    #15
         SUB.W   D2,D3 
         BRA     D_RANGE  
-       
- 
-PRINTPRE   LEA     INDIRECT,A1
-        BRA     PRINT
-        MOVE.B  #14,D0
-        TRAP    #15
-        MOVE.B  D6,D1
-        MOVE.B  #3,D0
-        TRAP    #15
-        
-        LEA     END_PAREN,A1
-        MOVE.B  #14,D0
-        TRAP    #15
-        BRA     DONE
         
 PRINT   MOVEA   A2,A1
         MOVE.B  #14,D0
@@ -413,10 +401,12 @@ FINAL   MOVEA   A3,A1
 WORD_END    MOVE.W  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
+        BRA     DONE
  
 LONG_END    MOVE.L  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
+        BRA     DONE
   
 INVALID MOVE.B  #$1,D6  * indicates invalid opcode, impossible to have displacement of 1
         BRA     DONE    * perform RTS
@@ -438,7 +428,7 @@ END_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    ',$'         ,0
 ZERO_ADD    DC.B    '000'        ,0
 LONG_ADD    DC.B    '0000000'    ,0
-INV     DC.B    'Not a valid MOVEM opcode',0
 
 
     END    REG_MEM        ; last line of source
+
