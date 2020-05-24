@@ -59,12 +59,14 @@ ABS_WORD ADDI.L  #$2,D5
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
         BEQ     INVALID
+        MOVE.W  (A0)+,D1 * put absolute word address in D4
+        CMP.L   A6,A0   * word is past ending memory address given by user
+        BGT     INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A1
         MOVE.B  #14,D0
         TRAP    #15
-        MOVE.W  (A0),D1 * put absolute word address in D4
         CMP.W   #$0000,D1
         BEQ     DISP_ADD
         MOVE.B  #3,D0
@@ -84,12 +86,14 @@ ABS_LONG  ADDI.L  #$2,D5
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
         BEQ     INVALID
+        MOVE.L  (A0)+,D1 * put absolute word address in D4
+        CMP.L   A6,A0
+        BGT     INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A1
         MOVE.B  #14,D0
         TRAP    #15
-        MOVE.L  (A0),D1 * put absolute word address in D4
         CMP.L   #$00000000,D1
         BEQ     DISP_LONG
         MOVE.B  #3,D0
@@ -125,7 +129,7 @@ DISP_LONG   LEA LONG_ADD,A1
 * here we grab the word representing the range of registers in MOVEM operand     
 REG_RANGE MOVE.B  D4,D3 * move opcode word to D3
         AND.B   #$07,D3 * obtain address register number
-        MOVE.B  D3,D1   * move to D6 for when we display register number
+        MOVE.B  D3,D1   * move to D1 for when we display register number
         
         ADDI.L  #$2,D5  * move PC counter by 2
         CMP.L   A6,D5   * check if we are reading past end memory address
@@ -297,8 +301,9 @@ POST_PLUS   DC.B    ')+,'        ,0
 ADDRPAREN   DC.B    '(A'         ,0
 END_PAREN   DC.B    '),'         ,0
 HEX_SYMB    DC.B    '$'          ,0
-ZERO_ADD    DC.B    '000,'        ,0
-LONG_ADD    DC.B    '0000000,'    ,0
+ZERO_ADD    DC.B    '0000'        ,0
+LONG_ADD    DC.B    '00000000'    ,0
 
 
     END    MEM_REG        ; last line of source
+
