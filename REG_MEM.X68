@@ -216,10 +216,13 @@ ABS_WORD ADDI.L  #$2,D5
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
         BEQ     INVALID
+        MOVEA.L A0,A4
+        MOVE.W  (A4)+,D4 * put absolute word address in D4
+        CMP.L   A6,A4   * word is past ending memory address given by user
+        BGT     INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
-        MOVE.W  (A0),D4 * put absolute word address in D4
         CMP.W   #$0000,D4
         BEQ     DISP_ADD
         MOVE.B  #$8,D6
@@ -233,10 +236,13 @@ ABS_LONG  ADDI.L  #$2,D5
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
         BEQ     INVALID
+        MOVEA.L A0,A4
+        MOVE.L  (A4)+,D4 * put absolute word address in D4
+        CMP.L   A6,A4   * word is past ending memory address given by user
+        BGT     INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
-        MOVE.L  (A0),D4 * put absolute word address in D4
         CMP.L   #$00000000,D4
         BEQ     DISP_LONG
         MOVE.B  #$9,D6
@@ -396,16 +402,19 @@ PRINT   MOVEA   A2,A1
 FINAL   MOVEA   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
+        MOVE.W  #$4,D6
         BRA     DONE
 
 WORD_END    MOVE.W  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
+        MOVE.W  #$6,D6  * displacement value stored in D6
         BRA     DONE
  
 LONG_END    MOVE.L  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
+        MOVE.W  #$8,D6  * displacement value stored in D6
         BRA     DONE
   
 INVALID MOVE.B  #$1,D6  * indicates invalid opcode, impossible to have displacement of 1
@@ -426,9 +435,10 @@ INDIRECT    DC.B    ',-(A'       ,0
 ADDRPAREN   DC.B    ',(A'        ,0
 END_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    ',$'         ,0
-ZERO_ADD    DC.B    '000'        ,0
-LONG_ADD    DC.B    '0000000'    ,0
+ZERO_ADD    DC.B    '000'       ,0
+LONG_ADD    DC.B    '0000000'   ,0
 
 
     END    REG_MEM        ; last line of source
+
 
