@@ -4,7 +4,6 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-    ORG    $1000
 MEM_REG:                  ; first instruction of program
 
 * Mask byte of opcode to figure out the size field
@@ -307,3 +306,10 @@ LONG_ADD    DC.B    '00000000'    ,0
 
     END    MEM_REG        ; last line of source
 
+
+
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
