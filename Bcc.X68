@@ -46,19 +46,19 @@ INVALID MOVE.W  #$1,D6  * indicates that opcode is invalid, displacement of 1 is
         BRA FINISH      * RTS since opcode is invalid, want to move to next word in memory
     
 * will print out that this is an Equals opcode   
-EQUAL   LEA EQ,A1
+EQUAL   LEA opcode_BEQ,A1
         BRA DISPLACEMENT
    
 * will print out that this is a less than or equal to opcode       
-LESS    LEA LESSEQUAL,A1
+LESS    LEA opcode_BLE,A1
         BRA DISPLACEMENT
 
 * will print out that this is a greater than opcode              
-GREATER LEA GREATERTHAN,A1
+GREATER LEA opcode_BGT,A1
         BRA DISPLACEMENT
         
 * will print out that this is a branch always opcode        
-ALWAYS  LEA BRANCH,A1
+ALWAYS  LEA opcode_BRA,A1
         BRA DISPLACEMENT
         
 * we assume that the memory location we are currently dissasembling was passed into D5
@@ -113,3 +113,8 @@ FINISH
 
 
     *END    BCC        ; last line of source
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~

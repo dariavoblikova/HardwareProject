@@ -2,10 +2,10 @@
 * Title      :
 * Written by : Amman Nega, Daria Voblikova
 * Date       : 5/22/2020
-* Description: This code asks the user for a 32-bit memory address
-* location to represent a starting memory address. The long value
-* will be stored in D5 and will be used by the main routine to start
-* reading from memory and decoding opcodes.
+* Description: This code asks the user for two 32-bit memory address
+* locations to represent a starting and an ending memory address. The long value
+* will be stored in D5 for starting address and in D6 for ending address and will be 
+* used by the main routine to start reading from memory and decoding opcodes.
 *-----------------------------------------------------------
 CR      EQU     $0D
 LF      EQU     $0A
@@ -14,7 +14,8 @@ ex      DS.B    $00
 
 IO                  ; first instruction of program
 
-* Stores 32-bit long value in D5 representing starting memory address.
+* Outputs 32-bit long value in D5 representing starting memory address.
+* Outputs 32-bit  long value in D6 representing ending memory address.
 * Assumptions: Hexadecimal values A-F must be capitalized, lowercase
 * letters result in an invalid message and asks the user to input again.
 
@@ -23,14 +24,27 @@ IO                  ; first instruction of program
 *TODO: Ask for ending address and perform similar validation checks, along
 * with making sure ending address doesn't come before starting address.
 GET_ADDRESS_IO
-                    MOVEM.L     D0-D4/D6-D7/A0-A6, -(SP)    * Enter subroutine. Saving all the registers(except D5) to the stack        
+                    MOVEM.L     D0-D4/D7/A0-A6, -(SP)       * Enter subroutine. Saving all the registers(except D5 and D6) to the stack
+GET_START_ADDR:        
+                    CLR.L       D5                          * Clear D5 register that we'll use for starting address output
                     LEA         InpStartAddrMess,A1         * Loads string into A1
                     MOVE.B      #14,D0                      * Stores our trap task in D0
                     TRAP        #15                         * Performs trap task 14, reading string from A1
                     MOVEA       #$6000,A2
+                    BRA         INPUT
     
+GET_END_ADDR:
+                    LEA         NEWL,A1                     * Loads new line string into A1
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    LEA         InpEndAddrMess,A1           * Loads string for end address into A1
+                    MOVE.B      #14,D0                      * Stores our trap task in D0
+                    TRAP        #15                         * Performs trap task 14, reading string from A1
+                    MOVEA       #$6000,A2
+                    CLR.L       D4                          * Clear D4 register used for counter in input routine (we just finished input for start address)
+                    
 INPUT               CMP         #$8,D4                      * Check if we should stop looping
-                    BEQ         DONE                        * Stop inputting after 8 chars
+                    BEQ         DONE_INPUT                  * Stop inputting after 8 chars
                     MOVE.B      #5,D0                       * Stores our trap task in D0
                     TRAP        #15                         * Performs trap task 5, read a character
                     MOVE.B      D1,D3                       * Move byte to D3, used as parameter for subroutine
@@ -79,8 +93,17 @@ INVALID_HEX         LEA         NEWL,A1
                     TRAP        #15                         * Print invalid message
                     BRA         INPUT                       * Re prompt user for valid hex digit
 
-DONE                MOVE.L      -(A2),D5
-                    MOVEM.L     (SP)+, D0-D4/D6-D7/A0-A6    * Returning from subroutine(need to pop saved registers). Returning D5 to the caller
+DONE_INPUT          CMP.L       #$0, D5                     * Since we cleared D5 before if it's not 0, it's got starting address already
+                    BNE         DONE_END_ADDR               * If not 0 branch to DONE_END_ADDR
+                    BEQ         DONE_START_ADDR             * If it's 0 branch to DONE_START_ADRR
+                    
+DONE_START_ADDR     MOVE.L      -(A2),D5                    * Saving Starting address to D5
+                    BRA         GET_END_ADDR
+
+DONE_END_ADDR       MOVE.L      -(A2),D6                    * Saving Ending address to D6
+                    BRA         BACK_TO_MAIN
+                    
+BACK_TO_MAIN        MOVEM.L     (SP)+, D0-D4/D7/A0-A6       * Returning from subroutine(need to pop saved registers). Returning staring in D5 and ending in D6
                     RTS                                     * Return to main routine
 
      * SIMHALT             ; halt simulator
@@ -90,6 +113,12 @@ DONE                MOVE.L      -(A2),D5
 * NEWL    DC.B    '',CR,LF,0
 
      * END         IO   ; last line of source
+
+
+
+
+
+
 
 
 
