@@ -1,0 +1,258 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 5/25/2020 1:13:10 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Main
+00000000                             3  * Written by : Daria Voblikova
+00000000                             4  * Date       : 5/18/2020
+00000000                             5  * Description: Includes other files (http://www.easy68k.com/EASy68Kforum/viewtopic.php?f=5&t=316)
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  * Amman: just testing to see if I could push my code
+00000000                             8  
+00000000  =00100000                  9  stack EQU $00100000
+00000000                            10      
+00001000                            11  MAIN    ORG    $1000
+00001000  4FF9 00100000             12      LEA         stack,SP                    Set location of the stack pointer
+00001006  4EB9 00022C50             13      JSR         GET_ADDRESS_IO              Located in IO.X68, Loads start address to D5 and end address to D6
+0000100C                            14      *JSR         MAIN_LOOP                   NOT IMPLEMENTED YET (should be in a separate file)
+0000100C                            15      *JSR         ASK_TO_REPEAT               NOT IMPLEMENTED YET(should be in I_O_SUBROUTINE)
+0000100C                            16      *CMP ...                                 COMPARE ANSWER TO 1 (1 = yes)
+0000100C                            17      *BEQ         MAIN
+0000100C  4EB9 00001018             18      JSR         FINISH_MESSAGE
+00001012  4EF9 00022E0C             19      JMP         STOP
+00001018                            20      
+00001018                            21  *-----------------------------------------------------------
+00001018                            22      INCLUDE 'I_O_SUBROUTINE.X68'            I/O subroutines    
+00001018                            23  
+00001018                            24  FINISH_MESSAGE:
+00001018  48E7 E040                 25      MOVEM.L     D0/D1/D2/A1, -(SP)          Push(save) registers
+0000101C                            26      
+0000101C  43F9 00022E04             27      LEA         NEWL,A1
+00001022  103C 000E                 28      MOVE.B      #14,D0
+00001026  4E4F                      29      TRAP        #15
+00001028                            30      
+00001028  43F9 00022D5F             31      LEA         FinishQuestionString, A1
+0000102E  103C 000E                 32      MOVE.B      #14, D0                     Task 14: Display the NULL terminated string at (A1) without CR, LF.
+00001032  4E4F                      33      TRAP        #15                         Display
+00001034                            34      
+00001034  303C 0004                 35      MOVE        #4,D0                       Task 4: Read a number from the keyboard into D1.L.
+00001038  4E4F                      36      TRAP        #15                         Perform task 4
+0000103A  2401                      37      MOVE.L      D1,D2                       D2 = user input
+0000103C  0C82 00000001             38      CMPI.L      #$1, D2                     Compare to 1
+00001042  6700 0008                 39      BEQ         FINISH_PROGRAM              If 1 finish the program
+00001046                            40    
+00001046  4CDF 0207                 41      MOVEM.L     (SP)+, D0/D1/D2/A1          Pop(restore) registers
+0000104A  4E75                      42      RTS
+0000104C                            43  
+0000104C                            44  FINISH_PROGRAM:
+0000104C  303C 0004                 45      MOVE        #4,D0                       JUST FOR TESTING!!REWRITE LATER
+00001050                            46  
+00001050                            47  
+00001050                            48  
+00001050  =00000000                 49  NULL    EQU 00
+00001050  =0000000D                 50  CR      EQU $0D                             ;ASCII code for Carriage Return
+00001050  =0000000A                 51  LF      EQU $0A                             ;ASCII code for Line Feed
+00001050                            52  
+00001050                            53  
+00001050                            54  
+00001050                            55  
+00001050                            56  
+00001050                            57  
+00001050                            58  -------------------- end include --------------------
+00001050                            59      * INCLUDE 'Bcc.X68'                     Decoding Branch Opcodes
+00001050                            60      * INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
+00001050                            61      * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
+00001050                            62      INCLUDE 'IO.X68'                        Get Adrresses AsciiToHex
+00001050  =0000000D                 63  CR      EQU     $0D
+00001050  =0000000A                 64  LF      EQU     $0A
+00001050                            65  num     DS.L    $8700
+00022C50                            66  ex      DS.B    $00
+00022C50                            67  
+00022C50                            68  IO                  ; first instruction of program
+00022C50                            69  
+00022C50                            70  
+00022C50                            71  GET_ADDRESS_IO
+00022C50  48E7 F9FE                 72                      MOVEM.L     D0-D4/D7/A0-A6, -(SP)       * Enter subroutine. Saving all the registers(except D5 and D6) to the stack
+00022C54                            73  GET_START_ADDR:        
+00022C54  4285                      74                      CLR.L       D5                          * Clear D5 register that we'll use for starting address output
+00022C56  43F9 00022D72             75                      LEA         InpStartAddrMess,A1         * Loads string into A1
+00022C5C  103C 000E                 76                      MOVE.B      #14,D0                      * Stores our trap task in D0
+00022C60  4E4F                      77                      TRAP        #15                         * Performs trap task 14, reading string from A1
+00022C62  347C 6000                 78                      MOVEA       #$6000,A2
+00022C66  6000 0020                 79                      BRA         INPUT
+00022C6A                            80      
+00022C6A                            81  GET_END_ADDR:
+00022C6A  43F9 00022E04             82                      LEA         NEWL,A1                     * Loads new line string into A1
+00022C70  103C 000E                 83                      MOVE.B      #14,D0                      * Stores task 14 in D0
+00022C74  4E4F                      84                      TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+00022C76  43F9 00022DA7             85                      LEA         InpEndAddrMess,A1           * Loads string for end address into A1
+00022C7C  103C 000E                 86                      MOVE.B      #14,D0                      * Stores our trap task in D0
+00022C80  4E4F                      87                      TRAP        #15                         * Performs trap task 14, reading string from A1
+00022C82  347C 6000                 88                      MOVEA       #$6000,A2
+00022C86  4284                      89                      CLR.L       D4                          * Clear D4 register used for counter in input routine (we just finished input for start address)
+00022C88                            90                      
+00022C88  B87C 0008                 91  INPUT               CMP         #$8,D4                      * Check if we should stop looping
+00022C8C  6700 0092                 92                      BEQ         DONE_INPUT                  * Stop inputting after 8 chars
+00022C90  103C 0005                 93                      MOVE.B      #5,D0                       * Stores our trap task in D0
+00022C94  4E4F                      94                      TRAP        #15                         * Performs trap task 5, read a character
+00022C96  1601                      95                      MOVE.B      D1,D3                       * Move byte to D3, used as parameter for subroutine
+00022C98  6000 0002                 96                      BRA         CONVERTNUM                  * Branch to subroutine that converts ASCII to hex
+00022C9C                            97  
+00022C9C  B63C 0039                 98  CONVERTNUM          CMP.B       #$39,D3                     * Check if input is valid hex digit from 0-9
+00022CA0  6E00 0028                 99                      BGT         CONVERTLETTER               * Branch to check if input is a character A-F
+00022CA4  B63C 0030                100                      CMP.B       #$30,D3                     * Check if input is greater than 30
+00022CA8  6D00 005E                101                      BLT         INVALID_HEX                 * Input is not a valid a hex digit
+00022CAC  0403 0030                102                      SUB.B       #$30,D3                     * Subtract 30 from input to convert ASCII to hex digit
+00022CB0  5204                     103                      ADD.B       #$1,D4                      * Increment D4,keep track of num inputs from user
+00022CB2  D483                     104                      ADD.L       D3,D2                       * Copy hex digit to D2, so we don't lose value
+00022CB4  B83C 0004                105                      CMP.B       #$4,D4  
+00022CB8  6700 0048                106                      BEQ         SWAP
+00022CBC  B83C 0008                107                      CMP.B       #$8,D4                      * Check if we're done looping
+00022CC0  6600 003A                108                      BNE         MULT                        * Make room for next hex digit
+00022CC4  6700 003C                109                      BEQ         SWAP
+00022CC8  60BE                     110                      BRA         INPUT                       * Branch to request another input from user
+00022CCA                           111  
+00022CCA  B63C 0041                112  CONVERTLETTER       CMP.B       #$41,D3                     * Check if ASCII character is letters A-F
+00022CCE  6D00 0038                113                      BLT         INVALID_HEX                 * Output that input is invalid hex digit
+00022CD2  B63C 0046                114                      CMP.B       #$46,D3                     * Check if ASCII character is letters A-F
+00022CD6  6E00 0030                115                      BGT         INVALID_HEX                 * Output that input is invalid hex digit
+00022CDA  0403 0040                116                      SUB.B       #$40,D3                     * Convert ASCII to hex digit
+00022CDE  0603 0009                117                      ADD.B       #$9,D3                      * Part of conversion from ASCII to hex
+00022CE2  5204                     118                      ADD.B       #$1,D4                      * Increment D4,keep track of num inputs from user
+00022CE4  D483                     119                      ADD.L       D3,D2                       * Copy hex digit to D2, so we don't lose value
+00022CE6  B83C 0004                120                      CMP.B       #$4,D4  
+00022CEA  6700 0016                121                      BEQ         SWAP
+00022CEE  B83C 0008                122                      CMP.B       #$8,D4                      * Check if we're done looping
+00022CF2  6600 0008                123                      BNE         MULT                        * Make room for next hex digit
+00022CF6  6700 000A                124                      BEQ         SWAP
+00022CFA  608C                     125                      BRA         INPUT                       * Branch to request another input from user
+00022CFC                           126  
+00022CFC  C5FC 0010                127  MULT                MULS        #$00000010,D2               * Multiply by 10 so we can add second hex digit later
+00022D00  6086                     128                      BRA         INPUT
+00022D02                           129          
+00022D02  34C2                     130  SWAP                MOVE.W      D2,(A2)+                    * Move the input to memory, one word at a time
+00022D04  4242                     131                      CLR         D2                          * Clear D2 to make room for data
+00022D06  6080                     132                      BRA         INPUT                       * Continue to get input
+00022D08                           133  
+00022D08  43F9 00022E04            134  INVALID_HEX         LEA         NEWL,A1
+00022D0E  103C 000E                135                      MOVE.B      #14,D0
+00022D12  4E4F                     136                      TRAP        #15
+00022D14  43F9 00022DDA            137                      LEA         INV_HEX_MESSAGE,A1          * Load string in A1
+00022D1A  4E4F                     138                      TRAP        #15                         * Print invalid message
+00022D1C  6000 FF6A                139                      BRA         INPUT                       * Re prompt user for valid hex digit
+00022D20                           140  
+00022D20  BABC 00000000            141  DONE_INPUT          CMP.L       #$0, D5                     * Since we cleared D5 before if it's not 0, it's got starting address already
+00022D26  6600 000C                142                      BNE         DONE_END_ADDR               * If not 0 branch to DONE_END_ADDR
+00022D2A  6700 0002                143                      BEQ         DONE_START_ADDR             * If it's 0 branch to DONE_START_ADRR
+00022D2E                           144                      
+00022D2E  2A22                     145  DONE_START_ADDR     MOVE.L      -(A2),D5                    * Saving Starting address to D5
+00022D30  6000 FF38                146                      BRA         GET_END_ADDR
+00022D34                           147  
+00022D34  2C22                     148  DONE_END_ADDR       MOVE.L      -(A2),D6                    * Saving Ending address to D6
+00022D36  6000 0002                149                      BRA         BACK_TO_MAIN
+00022D3A                           150                      
+00022D3A  4CDF 7F9F                151  BACK_TO_MAIN        MOVEM.L     (SP)+, D0-D4/D7/A0-A6       * Returning from subroutine(need to pop saved registers). Returning staring in D5 and ending in D6
+00022D3E  4E75                     152                      RTS                                     * Return to main routine
+00022D40                           153  
+00022D40                           154       * SIMHALT             ; halt simulator
+00022D40                           155  
+00022D40                           156  
+00022D40                           157  
+00022D40                           158       * END         IO   ; last line of source
+00022D40                           159  
+00022D40                           160  
+00022D40                           161  
+00022D40                           162  
+00022D40                           163  
+00022D40                           164  
+00022D40                           165  
+00022D40                           166  
+00022D40                           167  
+00022D40                           168  
+00022D40                           169  
+00022D40                           170  
+00022D40                           171  
+00022D40                           172  
+00022D40                           173  
+00022D40                           174  
+00022D40                           175  
+00022D40                           176  
+00022D40                           177  
+00022D40                           178  
+00022D40                           179  
+00022D40                           180  -------------------- end include --------------------
+00022D40                           181      INCLUDE 'strings.X68'                   Put all the strings here and give them good names
+00022D40                           182  ; OpCodes
+00022D40= 4D 4F 56 45 00           183  opcode_MOVE                     DC.B    'MOVE',0
+00022D45= 4D 4F 56 45 4D 00        184  opcode_MOVEM                    DC.B    'MOVEM',0
+00022D4B= 42 52 41 20 00           185  opcode_BRA                      DC.B    'BRA ',0
+00022D50= 42 45 51 20 00           186  opcode_BEQ                      DC.B    'BEQ ',0
+00022D55= 42 4C 45 20 00           187  opcode_BLE                      DC.B    'BLE ',0
+00022D5A= 42 47 54 20 00           188  opcode_BGT                      DC.B    'BGT ',0
+00022D5F                           189  
+00022D5F                           190  ; I_O_SUBROUTINE.X68
+00022D5F= 54 6F 20 66 69 6E ...    191  FinishQuestionString            DC.B    'To finish type 1',CR,LF,0
+00022D72                           192  
+00022D72                           193  ; IO.X68
+00022D72= 45 6E 74 65 72 20 ...    194  InpStartAddrMess                DC.B    'Enter an 8-digit starting address(even and in hex): ',0
+00022DA7= 45 6E 74 65 72 20 ...    195  InpEndAddrMess                  DC.B    'Enter an 8-digit ending address(even and in hex): ',0
+00022DDA= 4E 6F 74 20 61 20 ...    196  INV_HEX_MESSAGE                 DC.B    'Not a hex digit.',CR,LF,0
+00022DED                           197  
+00022DED                           198  ; Bcc.X68
+00022DED= 4E 6F 74 20 61 20 ...    199  INV_BCC_MESSAGE                 DC.B    'Not a valid Bcc opcode',0
+00022E04                           200  
+00022E04                           201  ; common
+00022E04= 0D 0A 00                 202  NEWL                            DC.B    '',CR,LF,0
+00022E07                           203  
+00022E07                           204  
+00022E07                           205  
+00022E07                           206  -------------------- end include --------------------
+00022E08  FFFF FFFF                207      SIMHALT                                 ; halt simulator
+00022E0C                           208  
+00022E0C                           209  STOP:
+00022E0C                           210      END    MAIN                             ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BACK_TO_MAIN        22D3A
+CONVERTLETTER       22CCA
+CONVERTNUM          22C9C
+CR                  D
+DONE_END_ADDR       22D34
+DONE_INPUT          22D20
+DONE_START_ADDR     22D2E
+EX                  22C50
+FINISHQUESTIONSTRING  22D5F
+FINISH_MESSAGE      1018
+FINISH_PROGRAM      104C
+GET_ADDRESS_IO      22C50
+GET_END_ADDR        22C6A
+GET_START_ADDR      22C54
+INPENDADDRMESS      22DA7
+INPSTARTADDRMESS    22D72
+INPUT               22C88
+INVALID_HEX         22D08
+INV_BCC_MESSAGE     22DED
+INV_HEX_MESSAGE     22DDA
+IO                  22C50
+LF                  A
+MAIN                1000
+MULT                22CFC
+NEWL                22E04
+NULL                0
+NUM                 1050
+OPCODE_BEQ          22D50
+OPCODE_BGT          22D5A
+OPCODE_BLE          22D55
+OPCODE_BRA          22D4B
+OPCODE_MOVE         22D40
+OPCODE_MOVEM        22D45
+STACK               100000
+STOP                22E0C
+SWAP                22D02

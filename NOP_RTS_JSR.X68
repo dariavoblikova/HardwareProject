@@ -89,11 +89,13 @@ ABSOLUTE    MOVE.B  D4,D3
             BRA     INVALID
             
 WORD        MOVE.B  #$4,D6  * store displacement in D6
+            ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.W  (A0),D3
             BRA     ABS_PRINT            
 
 LONG        MOVE.B  #$6,D6  * store displacement in D6
+            ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.L  (A0),D3
             BRA     ABS_PRINT
@@ -128,6 +130,7 @@ HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
     END    NOP_RTS_JSR        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
