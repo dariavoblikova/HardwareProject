@@ -4,6 +4,8 @@
 * Date       : 5/18/2020
 * Description: Includes other files (http://www.easy68k.com/EASy68Kforum/viewtopic.php?f=5&t=316)
 *-----------------------------------------------------------
+* Amman: just testing to see if I could push my code
+
 stack EQU $00100000
     
 MAIN    ORG    $1000
@@ -27,6 +29,7 @@ MAIN    ORG    $1000
 
 STOP:
     END    MAIN                             ; last line of source
+
 
 
 
