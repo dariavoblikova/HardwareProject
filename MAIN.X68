@@ -33,7 +33,7 @@ MNLP    Move.L #$00000002, D6 *by default go opcode length
         
         MOVEM.L D0-D5/D7/A0-A6, -(SP)
         *SUBROUTINE*
-        BSR ADD_SUBROUTINE
+        BSR HEXGROUP
         *since I only have add available right now, no point in hexgroup checking
         *TODO: hexgroup checking
         MOVEM.L (SP)+, D0-D5/D7/A0-A6
@@ -58,19 +58,21 @@ MNLP    Move.L #$00000002, D6 *by default go opcode length
 * Output:       Subroutine-dependent
 ****************************************************************
 HEXGROUP:
-        MOVEM   D0-D7/A0-A6, -(SP)
+        MOVEM.L   D0-D7/A0-A6, -(SP)
         *check static opcodes first*
         CMP.W   #$4E71, D4
         BEQ HXNOP
         BRA PHXNOP
-HXNOP   *insert NOP subroutine here*      
+HXNOP   MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert NOP subroutine here*
+        RTS      
 PHXNOP  CMP.W   #$4E75, D4
         BEQ HXRTS
         BRA PHXRTS
-HXRTS   *insert NOP subroutine here*      
-PHXRTS  
-    
-        *separate digits*
+HXRTS   MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert RTS subroutine here*   
+        RTS   
+PHXRTS  *separate digits*
         MOVE.B  D4,     D3
         AND.B   #$0F,   D3     *last digit in D3
     
@@ -91,9 +93,116 @@ PHXRTS
     
         LSR.L   #4,     D4     *shift to bring next digit to front
         *By this point, the digits 0123 of the opcode should be in D0,D1,D2,D3
-    
-    
-      
+        CMP.B   #$04,   D0
+        BEQ HXG4
+        BRA PHXG4
+HXG4    CMP.B   #$0E,   D1  *after this, known: 4E
+        BEQ HXG41
+        BRA PHXG41
+HXG41   CMP.B   #$09,   D2
+        BEQ HXG42
+        CMP.B   #$0B,   D2  *after this, known: 4E(9||B) 
+        BNE PHXG41                   
+HXG42   CMP.B   #$09,   D3  *after this, known: 4E(9||B)(0-9)
+        BGT PHXG41          
+HXJSR   MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert jsr subroutine here*
+        RTS
+PHXG41  CMP.B   #$06,   D1
+        BNE PHXNOT1 
+        CMP.B   #$0B,   D2
+        BGT PHXNOT1
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert NOT subroutine here*
+        RTS
+PHXNOT1 MOVE.B  D1,     -(SP)
+        AND.B   #$01,   D1
+        CMP.B   #$00,   D1
+        BEQ     PHXLEA      *if least significant bit is 0 then not odd, therefore not lea
+        CMP.B   #$0D,   D2
+        BEQ HXLEAZ9
+        CMP.B   #$0F,   D2
+        BNE PHXLEA
+HXLEAZ9 CMP.B   #$09,   D3
+        BGT PHXLEA        
+        MOVE.B  (SP)+,  D1
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert LEA subroutine here*
+        RTS
+PHXLEA  MOVE.B  (SP)+,  D1
+        CMP.B   #$08,   D1
+        BEQ HXMVM2
+        CMP.B   #$0C,   D1
+        BNE HX4ERR
+HXMVM2  CMP.B   #$08,   D2
+        BLT HX4ERR
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert MOVEM subroutine here*
+        RTS
+HX4ERR  *insert error message here* 
+        RTS   
+PHXG4   CMP.B   #$04,   D0
+        BGE PHXGM           *Hexgroup Move is 1-3
+        CMP.B   #$00,   D0
+        BEQ PHXGM
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert MOVE/MOVEA subroutine here*
+        RTS
+PHXGM   CMP.B   #$07,   D0
+        BNE PHXMQ
+        MOVE.B  D1,     -(SP)
+        AND.B   #$01,   D1
+        CMP.B   #$00,   D1
+        BNE PHXMQ0
+        MOVE.B  (SP)+,  D1
+        MOVEM.L (SP)+,  D0-D7/A0-A6
+        *insert MOVEQ subroutine here*
+        RTS
+PHXMQ0  MOVE.B (SP)+,   D1
+PHXMQ   CMP.B   #$0D,   D0
+        BNE PHXADD
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        BSR ADD_SUBROUTINE
+        RTS
+PHXADD  CMP.B   #$05,   D0
+        BNE PHXADQ
+        MOVE.B  D1,     -(SP)
+        AND.B   #$01,   D1
+        CMP.B   #$00,   D1
+        BNE PHXADQ0
+        MOVE.B  (SP)+,  D1
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert ADDQ subroutine here*
+        RTS
+PHXADQ0 MOVE.B  (SP)+,  D1
+PHXADQ  CMP.B   #$09,   D0
+        BNE PHXSUB
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert SUB subroutine here*
+        RTS  
+PHXSUB  CMP.B   #$0C,   D0
+        BNE PHXAND
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert AND subroutine here*
+        RTS
+PHXAND  CMP.B   #$08,   D0
+        BNE PHXOR
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert OR subroutine here*
+        RTS  
+PHXOR   CMP.B   #$0E,   D0
+        BNE PHXSHFT
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert SHIFT subroutine here*
+        RTS
+PHXSHFT CMP.B   #$06,   D0
+        BNE PHXSIX
+        MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert BRANCH subroutine here*
+        RTS
+PHXSIX  MOVEM.L   (SP)+, D0-D7/A0-A6
+        *insert ERROR message here*
+        RTS
 
 
 ****************************************************************
@@ -182,6 +291,7 @@ ADDRESS_STRING  DC.B    'CCCCCCCC',0
 
 END:    SIMHALT             ; halt simulator
         END    START        ; last line of source
+
 
 
 
