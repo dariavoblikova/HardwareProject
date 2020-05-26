@@ -14,23 +14,21 @@ ex      DS.B    $00
 
 IO                  ; first instruction of program
 
-* Outputs 32-bit long value in D5 representing starting memory address.
-* Outputs 32-bit  long value in D6 representing ending memory address.
+* Outputs 32-bit long value in A5 representing starting memory address.
+* Outputs 32-bit  long value in A6 representing ending memory address.
 * Assumptions: Hexadecimal values A-F must be capitalized, lowercase
 * letters result in an invalid message and asks the user to input again.
 
-*TODO: Validate starting memory address, (it's within appropriate range,
-* and the value is even)
-*TODO: Ask for ending address and perform similar validation checks, along
-* with making sure ending address doesn't come before starting address.
+*TODO: Validate addresses are within appropriate range?
 GET_ADDRESS_IO
-                    MOVEM.L     D0-D4/D7/A0-A6, -(SP)       * Enter subroutine. Saving all the registers(except D5 and D6) to the stack
+                    MOVEM.L     D0-D7/A0-A4, -(SP)       * Enter subroutine. Saving all the registers(except D5 and D6) to the stack
 GET_START_ADDR:        
                     CLR.L       D5                          * Clear D5 register that we'll use for starting address output
                     LEA         InpStartAddrMess,A1         * Loads string into A1
                     MOVE.B      #14,D0                      * Stores our trap task in D0
                     TRAP        #15                         * Performs trap task 14, reading string from A1
                     MOVEA       #$6000,A2
+                    CLR.L       D4                          * Clear D4 register used for counter in input routine
                     BRA         INPUT
     
 GET_END_ADDR:
@@ -101,9 +99,35 @@ DONE_START_ADDR     MOVE.L      -(A2),D5                    * Saving Starting ad
                     BRA         GET_END_ADDR
 
 DONE_END_ADDR       MOVE.L      -(A2),D6                    * Saving Ending address to D6
-                    BRA         BACK_TO_MAIN
+                    BRA         CHECK_INPUTS
                     
-BACK_TO_MAIN        MOVEM.L     (SP)+, D0-D4/D7/A0-A6       * Returning from subroutine(need to pop saved registers). Returning staring in D5 and ending in D6
+CHECK_INPUTS        MOVE.L      D5, A5                      * Preparing output. Copying starting address to A5
+                    MOVE.L      D6, A6                      * Preparing output. Copying ending address to A6
+                    CMPA.L      A5, A6                      * A6-A5
+                    BLE         ADDRESS_INPUT_ERROR         * if A6 <= A5, input error
+                    BTST        #0,D5                       * test the least significant bit in D5(starting address), #0 means least significant
+                    BNE         NOT_EVEN_ADDRESS            * if the bit is not zero => the address is odd
+                    BTST        #0,D6                       * test the least significant bit in D6(endinging address), #0 means least significant
+                    BNE         NOT_EVEN_ADDRESS            * if the bit is not zero => the address is odd
+                    BRA         SUCCESS_ADDR_INPUT
+                    
+ADDRESS_INPUT_ERROR LEA         NEWL,A1                     * Loads new line string into A1
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    LEA         InvAddresses,A1             * Input doesn't make sense(starting is less than ending). Load error message 
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    BRA         GET_START_ADDR              * Starting address is less than ending address. Start over
+                    
+NOT_EVEN_ADDRESS    LEA         NEWL,A1
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    LEA         OddAddrErr,A1               * Load odd address error message
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    BRA         GET_START_ADDR              * One of the addresses is odd. Start over
+SUCCESS_ADDR_INPUT
+                    MOVEM.L     (SP)+, D0-D7/A0-A4          * Returning from subroutine(need to pop saved registers). Returning starting addr in A5 and ending in A6
                     RTS                                     * Return to main routine
 
      * SIMHALT             ; halt simulator
@@ -113,6 +137,10 @@ BACK_TO_MAIN        MOVEM.L     (SP)+, D0-D4/D7/A0-A6       * Returning from sub
 * NEWL    DC.B    '',CR,LF,0
 
      * END         IO   ; last line of source
+
+
+
+
 
 
 

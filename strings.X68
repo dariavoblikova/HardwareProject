@@ -9,16 +9,23 @@ opcode_BGT                      DC.B    'BGT ',0
 ; I_O_SUBROUTINE.X68
 FinishQuestionString            DC.B    'To finish type 1',CR,LF,0
 
-; IO.X68
+; USERINPUT.X68
 InpStartAddrMess                DC.B    'Enter an 8-digit starting address(even and in hex): ',0
 InpEndAddrMess                  DC.B    'Enter an 8-digit ending address(even and in hex): ',0
 INV_HEX_MESSAGE                 DC.B    'Not a hex digit.',CR,LF,0
+InvAddresses                    DC.B    'Starting address has to be less than an ending address. Try again! ',CR,LF,0
+OddAddrErr                      DC.B    'Provided addresses have to be even. Try again! ',CR,LF,0
 
 ; Bcc.X68
 INV_BCC_MESSAGE                 DC.B    'Not a valid Bcc opcode',0
 
 ; common
 NEWL                            DC.B    '',CR,LF,0
+
+
+
+
+
 
 
 
