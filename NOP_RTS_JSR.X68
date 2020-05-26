@@ -7,7 +7,7 @@
 *    ORG    $2000 starting address determined by the user
 
 NOP_RTS_JSR:                  ; first instruction of program
-
+    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * Enter this subroutine when we know we have a subroutine (RTS, JSR) or NOP
 * instruction that we want to decode. That is if the first byte is 4E.
 * Assuming that a word was given to us hexadecimal in data register 4.
@@ -110,15 +110,17 @@ ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
             
             MOVE.L  D3,D1
             MOVE.B  #3,D0
-            TRAP    #15
+            TRAP    #15    
+            
             BRA     DONE
            
 PRINT       MOVE.B  #14,D0
             TRAP    #15
     
    
-DONE        RTS     *Return to subroutine here
-    SIMHALT             ; halt simulator
+DONE        MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
+            RTS     *Return to subroutine here
+    * SIMHALT             ; halt simulator
 
 * Put variables and constants here
 NOP_M       DC.B    'NOP    ',0
@@ -129,7 +131,11 @@ END_PAREN   DC.B    ')'      ,0
 HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
-    END    NOP_RTS_JSR        ; last line of source
+    * END    NOP_RTS_JSR        ; last line of source
+
+
+
+
 
 
 *~Font name~Courier New~

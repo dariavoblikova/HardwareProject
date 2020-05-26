@@ -2,7 +2,7 @@
 * Title      : Main
 * Written by : Daria Voblikova
 * Date       : 5/18/2020
-* Description: Includes other files (http://www.easy68k.com/EASy68Kforum/viewtopic.php?f=5&t=316)
+* Description: Includes other files
 *-----------------------------------------------------------
 * Amman: just testing to see if I could push my code
 
@@ -10,8 +10,13 @@ stack EQU $00100000
     
 MAIN    ORG    $1000
     LEA         stack,SP                    Set location of the stack pointer
-    JSR         GET_ADDRESS_IO              Located in USERINPUT.X68, Loads start address to D5 and end address to D6
-    *JSR         MAIN_LOOP                   NOT IMPLEMENTED YET (should be in a separate file)
+    JSR         GET_ADDRESS_IO              Located in USERINPUT.X68, Loads start address to A5 and end address to A6
+    
+    LEA         NEWLINE,A1                  Print new line
+    MOVE.B      #14,D0                      Stores task 14 in D0
+    TRAP        #15                         Task 15, print new line
+
+    JSR         MAIN_LOOP                   Located in MAIN_LOOP.X68 file
     *JSR         ASK_TO_REPEAT               NOT IMPLEMENTED YET(should be in I_O_SUBROUTINE)
     *CMP ...                                 COMPARE ANSWER TO 1 (1 = yes)
     *BEQ         MAIN
@@ -19,16 +24,20 @@ MAIN    ORG    $1000
     JMP         STOP
     
 *-----------------------------------------------------------
-    INCLUDE 'I_O_SUBROUTINE.X68'            I/O subroutines    
+    * The order of includes is important!!
+    INCLUDE 'I_O_SUBROUTINE.X68'            I/O subroutines
+    INCLUDE 'USERINPUT.X68'                 Get Adrresses AsciiToHex
+    INCLUDE 'MAIN_LOOP.X68'                 Opcodes loop
     * INCLUDE 'Bcc.X68'                     Decoding Branch Opcodes
-    * INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
+    INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
-    INCLUDE 'USERINPUT.X68'                        Get Adrresses AsciiToHex
     INCLUDE 'strings.X68'                   Put all the strings here and give them good names
+      
     SIMHALT                                 ; halt simulator
 
 STOP:
     END    MAIN                             ; last line of source
+
 
 
 
