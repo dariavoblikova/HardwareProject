@@ -8,20 +8,107 @@
 SHIFT_OPCODES:                  ; first instruction of program
 
 * Put program code here
-    MOVE.W  D4,D3     * store copy in D3 for masking
+* determine if there is an EA or not
+SHIFT_START    CLR     D7
+    MOVE.B  D4,D3
+    ANDI.B  #$C0,D3
+    CMP.B   #$C0,D3
+    BEQ     EACHECK
+    BRA     NOTEA
+
+* check which type of shift opcode has the EA
+EACHECK MOVE.W  D4,D3
+    ANDI.W  #$0E00,D3
+    CMP.W   #$0000,D3
+    BEQ     ASHIFT
+    CMP.W   #$0600,D3
+    BEQ     RSHIFT
+    CMP.W   #$0200,D3
+    BEQ     LSHIFT
+
+* find direction type of arithmetic shift
+ASHIFT  MOVE.W  #$1,D7
+    BRA     ARITHMETIC
+
+* find direction type of rotation
+RSHIFT   MOVE.W  #$1,D7
+    BRA     ROTATE
+  
+* find direction type of logical shift  
+LSHIFT  MOVE.W  #$1,D7
+    BRA     LOGICAL
+    
+* in case there is no EA, check what shift opcode it is    
+NOTEA  MOVE.B   D4,D3
+    ANDI.B  #$18,D3
+    CMP.B   #$00,D3
+    BEQ     ARITHMETIC
+    CMP.B   #$18,D3
+    BEQ     ROTATE
+    CMP.B   #$01,D3
+    BEQ     LOGICAL
+    BRA     INVALID
+      
+* determine if arithmetic left or right
+ARITHMETIC    MOVE.W  D4,D3     * store copy in D3 for masking
+    ANDI.W  #$0100,D3 * mask opcode to see if it's rotate left or right
+    CMP.W   #$0100,D3
+    BEQ     LEFT_ARITH * if equal, we know it's a left rotate
+    CMP.W   #$0000,D3
+    BEQ     RIGHT_ARITH * if equal, we know it's a right rotate    
+
+* determine if rotate left or right
+ROTATE    MOVE.W  D4,D3     * store copy in D3 for masking
     ANDI.W  #$0100,D3 * mask opcode to see if it's rotate left or right
     CMP.W   #$0100,D3
     BEQ     LEFT_ROTATE * if equal, we know it's a left rotate
     CMP.W   #$0000,D3
     BEQ     RIGHT_ROTATE * if equal, we know it's a right rotate
+    
+* determine if rotate left or right
+LOGICAL   MOVE.W  D4,D3     * store copy in D3 for masking
+    ANDI.W  #$0100,D3 * mask opcode to see if it's rotate left or right
+    CMP.W   #$0100,D3
+    BEQ     LEFT_LOGICAL * if equal, we know it's a left rotate
+    CMP.W   #$0000,D3
+    BEQ     RIGHT_LOGICAL * if equal, we know it's a right rotate
+ 
+* loads string specifying direction of rotate   
+LEFT_LOGICAL LEA LOGICALL,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
+    BRA     REG_NUM
+  
+* loads string specifying direction of rotate     
+RIGHT_LOGICAL LEA LOGICALR,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
+    BRA     REG_NUM 
  
 * loads string specifying direction of rotate   
 LEFT_ROTATE LEA ROTATEL,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
     BRA     REG_NUM
   
 * loads string specifying direction of rotate     
 RIGHT_ROTATE LEA ROTATER,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
     BRA     REG_NUM
+    
+* loads string specifying direction of rotate   
+LEFT_ARITH LEA ARITHL,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
+    BRA     REG_NUM
+  
+* loads string specifying direction of rotate     
+RIGHT_ARITH LEA ARITHR,A1
+    CMP.W   #$1,D7
+    BEQ     EA      * we know there is an EA, so skip REG_NUM
+    BRA     REG_NUM
+    
 
 * finds count/register value    
 REG_NUM MOVE.W  D4,D1   * store copy in D1 for masking
@@ -67,11 +154,13 @@ EA      MOVE.B  D4,D3
         BEQ     SHIFT_WORD  * EA is absolute word addressing
         CMP.B   #$39,D3
         BEQ     SHIFT_LONG  * EA is absolute long addressing
+        BRA     INVALID
         
 SHIFT_IND   LEA ADDRI,A2
         LEA     ENDPAREN,A3
         MOVE.B  D4,D1
         ANDI.B  #$07,D1 * only show register number bits
+        MOVE.W  #$2,D6      * store displacement
         BRA     PRINTIND
         
         
@@ -79,12 +168,14 @@ SHIFT_POST  LEA ADDRI,A2
         LEA     POSTPAREN,A3
         MOVE.B  D4,D1
         ANDI.B  #$07,D1 * only show register number bits
+        MOVE.W  #$2,D6      * store displacement
         BRA     PRINTIND
         
 SHIFT_PRE   LEA PREPAREN,A2
         LEA     ENDPAREN,A3
         MOVE.B  D4,D1
         ANDI.B  #$07,D1 * only show register number bits
+        MOVE.W  #$2,D6      * store displacement
         BRA     PRINTIND
         
 SHIFT_WORD  LEA HEXSYMB,A2  * load string with '$' symbol in A2
@@ -93,6 +184,7 @@ SHIFT_WORD  LEA HEXSYMB,A2  * load string with '$' symbol in A2
         BGE     INVALID     * past ending address
         MOVEA.L D5,A3
         MOVE.W  (A3),D1     * move absolute word address to D1
+        MOVE.W  #$4,D6      * store displacement
         BRA     PRINTABS        
 
 SHIFT_LONG  LEA HEXSYMB,A2  * load string with '$' symbol in A2
@@ -103,6 +195,7 @@ SHIFT_LONG  LEA HEXSYMB,A2  * load string with '$' symbol in A2
         ADDI.L  #$2,D5
         MOVEA.L D5,A3
         MOVE.L  (A3),D1     * move absolute word address to D1
+        MOVE.W  #$6,D6      * store displacement
         BRA     PRINTABS
         
 PRINTABS MOVE.B #14,D0
@@ -183,6 +276,10 @@ DONE    RTS
 * Put variables and constants here
 ROTATEL DC.B    'ROL',0
 ROTATER DC.B    'ROR',0
+ARITHL  DC.B    'ASL',0
+ARITHR  DC.B    'ASR',0
+LOGICALL    DC.B    'LSL',0
+LOGICALR    DC.B    'LSR',0
 SIZEB   DC.B    '.B     ',0
 SIZEW   DC.B    '.W     ',0
 SIZEL   DC.B    '.L     ',0
@@ -197,6 +294,7 @@ SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
 
     END    SHIFT_OPCODES        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
