@@ -222,7 +222,8 @@ PRINTIND MOVE.B #14,D0
         BRA     DONE
 
 * check if count/register is immediate value or data register
-IR      MOVE.B  D4,D3  * store copy in D3 for masking 
+IR      MOVE.W  #$2,D6  * store displacement in D6
+        MOVE.B  D4,D3  * store copy in D3 for masking 
         ANDI.B  #$20,D3 * only show i/r bit
         CMP.B   #$20,D3
         BEQ     DREG    * need to display that this is a data register
@@ -294,6 +295,7 @@ SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
 
     END    SHIFT_OPCODES        ; last line of source
+
 
 
 *~Font name~Courier New~
