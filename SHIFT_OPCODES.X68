@@ -59,6 +59,8 @@ EA      MOVE.B  D4,D3
         BEQ     SHIFT_IND   * EA is address register indirect
         CMP.B   #$18,D3
         BEQ     SHIFT_POST  * EA is address register indirect post-increment
+        CMP.B   #$20,D3
+        BEQ     SHIFT_PRE   * EA is address register indirect pre-decrement
         MOVE.B  D4,D3
         ANDI.B  #$3F,D3     * only show EA bits
         CMP.B   #$38,D3
@@ -75,6 +77,12 @@ SHIFT_IND   LEA ADDRI,A2
         
 SHIFT_POST  LEA ADDRI,A2
         LEA     POSTPAREN,A3
+        MOVE.B  D4,D1
+        ANDI.B  #$07,D1 * only show register number bits
+        BRA     PRINTIND
+        
+SHIFT_PRE   LEA PREPAREN,A2
+        LEA     ENDPAREN,A3
         MOVE.B  D4,D1
         ANDI.B  #$07,D1 * only show register number bits
         BRA     PRINTIND
@@ -182,9 +190,15 @@ DATAR   DC.B    'D',0
 POUNDSIGN   DC.B    '#',0
 COMMA   DC.B    ',',0
 ADDRI   DC.B    '(A',0
+PREPAREN  DC.B  '-(A',0
 ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
 
     END    SHIFT_OPCODES        ; last line of source
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
