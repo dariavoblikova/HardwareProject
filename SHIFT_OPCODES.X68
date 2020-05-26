@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
-* Title      :
-* Written by :
-* Date       :
-* Description:
+* Title      : Shift Opcodes
+* Written by : Amman Nega
+* Date       : May 25, 2020
+* Description: Decodes ROR, ROL, ASR, ASL, LSR, and LSL.
 *-----------------------------------------------------------
 
 SHIFT_OPCODES:                  ; first instruction of program
@@ -59,6 +59,12 @@ EA      MOVE.B  D4,D3
         BEQ     SHIFT_IND   * EA is address register indirect
         CMP.B   #$18,D3
         BEQ     SHIFT_POST  * EA is address register indirect post-increment
+        MOVE.B  D4,D3
+        ANDI.B  #$3F,D3     * only show EA bits
+        CMP.B   #$38,D3
+        BEQ     SHIFT_WORD  * EA is absolute word addressing
+        CMP.B   #$39,D3
+        BEQ     SHIFT_LONG  * EA is absolute long addressing
         
 SHIFT_IND   LEA ADDRI,A2
         LEA     ENDPAREN,A3
@@ -72,6 +78,34 @@ SHIFT_POST  LEA ADDRI,A2
         MOVE.B  D4,D1
         ANDI.B  #$07,D1 * only show register number bits
         BRA     PRINTIND
+        
+SHIFT_WORD  LEA HEXSYMB,A2  * load string with '$' symbol in A2
+        ADDI.L  #$2,D5
+        CMP.L   A6,D5
+        BGE     INVALID     * past ending address
+        MOVEA.L D5,A3
+        MOVE.W  (A3),D1     * move absolute word address to D1
+        BRA     PRINTABS        
+
+SHIFT_LONG  LEA HEXSYMB,A2  * load string with '$' symbol in A2
+        MOVE.L  D5,D2
+        ADDI.L  #$4,D2
+        CMP.L   A6,D2
+        BGE     INVALID     * past ending address
+        ADDI.L  #$2,D5
+        MOVEA.L D5,A3
+        MOVE.L  (A3),D1     * move absolute word address to D1
+        BRA     PRINTABS
+        
+PRINTABS MOVE.B #14,D0
+        TRAP    #15
+        LEA     SPACE,A1    * create empty space between opcode and operand
+        TRAP    #15
+        MOVEA   A2,A1
+        TRAP    #15
+        MOVE.B  #3,D0
+        TRAP    #15
+        BRA     DONE
 
 PRINTIND MOVE.B #14,D0
         TRAP    #15
@@ -131,7 +165,8 @@ PRINT   MOVE.B  #14,D0
         TRAP    #15
         BRA     DONE
         
-        
+INVALID MOVE.B  #$1,D6  * indicates invalid opcode, impossible to have displacement of 1
+        BRA     DONE    * perform RTS        
         
 
 DONE    RTS
@@ -150,11 +185,6 @@ ADDRI   DC.B    '(A',0
 ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
+HEXSYMB     DC.B    '$',0
 
     END    SHIFT_OPCODES        ; last line of source
-
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
