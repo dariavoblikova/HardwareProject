@@ -78,6 +78,8 @@ NEG     ADDI.W  #$FF00,D6   * make D4 sign extended
         BRA     EIGHT    * branch to calculate displacement
 
 EIGHT   ADD.W   D6,D1   * calculate displacement and store result in D1
+        MOVE.W  #$2,D6  * store displacement in D6
+        BRA     OUTPUT
 
 OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console 
         TRAP    #15
@@ -95,7 +97,8 @@ SIXTEEN ADDI.L  #$2,D5
         BGE     INVALID
         MOVEA.L D5,A2   * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next word
-        ADD.W   (A2),D1 * calculate 16-bit displacement 
+        ADD.W   (A2),D1 * calculate 16-bit displacement
+        MOVE.W  #$4,D6  * store displacement in D6
         BRA     OUTPUT  * output displacement to display
         
 THIRTYTWO   ADDI.L  #$4,D5
@@ -104,6 +107,7 @@ THIRTYTWO   ADDI.L  #$4,D5
         MOVEA.L  D5,A2 * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next long
         ADD.L   (A2),D1 * calculate 32-bit displacement
+        MOVE.W  #$6,D6  * store displacement in D6
         BRA     OUTPUT  * output displacement to display
 
 FINISH        
@@ -113,6 +117,7 @@ FINISH
 
 
     *END    BCC        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
