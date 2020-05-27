@@ -11,7 +11,8 @@ CR      EQU     $0D
 LF      EQU     $0A
 
 MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers 
-MAIN_LOOPS  CMPA.L      A5,A6                       * A6-A5 (MAIN_LOOPS for MAIN_LOOP start, fixes stack issue with saving each loop)
+MAIN_LOOPS  MOVE.L      A5,D5
+            CMPA.L      A5,A6                       * A6-A5 (MAIN_LOOPS for MAIN_LOOP start, fixes stack issue with saving each loop)
             BLE         EXIT_MAIN_LOOP              * IF A6<=A5, we are done
             JSR         PRINT_CURR_ADDR             * Print current memory location to the console
             MOVE.W      (A5),D4                     * Load opcode word to D4, subroutines use it
