@@ -6,63 +6,63 @@
 *-----------------------------------------------------------
     ORG    $1000
 REG_MEM:                  ; first instruction of program
-
+    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * Mask byte of opcode to figure out the size field
     MOVE.B  D4,D3
     AND.B   #$C0,D3
     CMP.B   #$80,D3
-    BEQ     WORD
+    BEQ     REG_MEM_WORD
     CMP.B   #$C0,D3
-    BEQ     LONG
-    BRA     INVALID
+    BEQ     REG_MEM_LONG
+    BRA     REG_MEM_INVALID
 
 * branch here if size field is a word    
-WORD    LEA WORD_LEN,A1
-        BRA EA_MODE
+REG_MEM_WORD    LEA WORD_LEN,A1
+        BRA REG_MEM_EA_MODE
   
 * branch here if size field is a long      
-LONG    LEA LONG_LEN,A1
-        BRA EA_MODE
+REG_MEM_LONG    LEA LONG_LEN,A1
+        BRA REG_MEM_EA_MODE
   
 * identify EA mode      
-EA_MODE MOVE.B  D4,D3
+REG_MEM_EA_MODE MOVE.B  D4,D3
         AND.B   #$38,D3
         CMP.B   #$20,D3
-        BEQ     PRE_DEC * we know it's a predecrement mode if equal
+        BEQ     REG_MEM_PRE_DEC * we know it's a predecrement mode if equal
         CMP.B   #$10,D3
-        BEQ     IND_ADDR
+        BEQ     REG_MEM_IND_ADDR
         
         * check for absolute addressing EA
         MOVE.B  D4,D3
         AND.B   #$3F,D3
         CMP.B   #$38,D3
-        BEQ     ABS_WORD
+        BEQ     REG_MEM_ABS_WORD
         CMP.B   #$39,D3
-        BEQ     ABS_LONG  
+        BEQ     REG_MEM_ABS_LONG  
         
-        BRA     INVALID
+        BRA     REG_MEM_INVALID
     
-PRE_DEC MOVE.B  D4,D3
+REG_MEM_PRE_DEC MOVE.B  D4,D3
         AND.B   #$07,D3 * obtain address register number
         MOVE.B  D3,D6   * move to D6 for when we display register number
         
         ADDI.L  #$2,D5
         CMP.L   A6,D5
-        BGE     INVALID * opcode is out of bounds of memory we read  
+        BGE     REG_MEM_INVALID * opcode is out of bounds of memory we read  
         MOVEA.L  D5,A0  * move PC counter to an address register
         MOVE.W  (A0),D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
-        BEQ     INVALID
+        BEQ     REG_MEM_INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         CLR     D4
         LEA     INDIRECT,A2
         LEA     END_PAREN,A3
-        BRA     DATA_RANGE   
+        BRA     REG_MEM_DATA_RANGE   
 
 * find out range of data registers we are moving to memory        
-DATA_RANGE CMP.L    #$0100,D3
-        BLT ADDR_RANGE
+REG_MEM_DATA_RANGE CMP.L    #$0100,D3
+        BLT REG_MEM_ADDR_RANGE
         
         * we compare the register range with each possible value
         * and display the register in the output
@@ -70,64 +70,64 @@ DATA_RANGE CMP.L    #$0100,D3
         MOVE.W  #$8000,D2
         MOVE.W  #$0,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$4000,D2
         MOVE.W  #$1,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$2000,D2
         MOVE.W  #$2,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$1000,D2
         MOVE.W  #$3,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$0800,D2
         MOVE.W  #$4,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$0400,D2
         MOVE.W  #$5,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$0200,D2
         MOVE.W  #$6,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
         MOVE.W  #$0100,D2
         MOVE.W  #$7,D7
         CMP.L   D2,D3
-        BGE     MIN_DATA
+        BGE     REG_MEM_MIN_DATA
         
-MIN_DATA    CMP.B   #$00,D4
-        BEQ FIRST_REG
-        BRA ADD_SLASH
+REG_MEM_MIN_DATA    CMP.B   #$00,D4
+        BEQ REG_MEM_FIRST_REG
+        BRA REG_MEM_ADD_SLASH
         
-ADD_SLASH LEA   DATA_SLASH,A1       
-        BRA SUB_DATAVALUE 
+REG_MEM_ADD_SLASH LEA   DATA_SLASH,A1       
+        BRA REG_MEM_SUB_DATAVALUE 
 
-FIRST_REG MOVE.W  #$0001,D4
+REG_MEM_FIRST_REG MOVE.W  #$0001,D4
         LEA DATA_REG,A1
-        BRA SUB_DATAVALUE 
+        BRA REG_MEM_SUB_DATAVALUE 
         
-SUB_DATAVALUE   MOVE.B  #14,D0
+REG_MEM_SUB_DATAVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
         MOVE.B  #3,D0
         TRAP    #15
         SUB.W   D2,D3 
-        BRA     DATA_RANGE       
+        BRA     REG_MEM_DATA_RANGE       
         
-ADDR_RANGE    CMP.L    #$0000,D3
-        BEQ PRINT
+REG_MEM_ADDR_RANGE    CMP.L    #$0000,D3
+        BEQ REG_MEM_PRINT
         
         * we compare the register range with each possible value
         * and display the register in the output
@@ -135,131 +135,131 @@ ADDR_RANGE    CMP.L    #$0000,D3
         MOVE.W  #$0080,D2
         MOVE.W  #$0,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0040,D2
         MOVE.W  #$1,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0020,D2
         MOVE.W  #$2,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0010,D2
         MOVE.W  #$3,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0008,D2
         MOVE.W  #$4,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0004,D2
         MOVE.W  #$5,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0002,D2
         MOVE.W  #$6,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
         
         MOVE.W  #$0001,D2
         MOVE.W  #$7,D7
         CMP.L   D2,D3
-        BGE     MIN_ADDR
+        BGE     REG_MEM_MIN_ADDR
   
-MIN_ADDR    CMP.B   #$00,D4
-        BEQ FIRSTA_REG
-        BRA ADDA_SLASH
+REG_MEM_MIN_ADDR    CMP.B   #$00,D4
+        BEQ REG_MEM_FIRSTA_REG
+        BRA REG_MEM_ADDA_SLASH
 
-ADDA_SLASH LEA   ADDR_SLASH,A1       
-        BRA SUB_ADDRVALUE 
+REG_MEM_ADDA_SLASH LEA   ADDR_SLASH,A1       
+        BRA REG_MEM_SUB_ADDRVALUE 
 
-FIRSTA_REG MOVE.W  #$0001,D4
+REG_MEM_FIRSTA_REG MOVE.W  #$0001,D4
         LEA ADDR_REG,A1
-        BRA SUB_ADDRVALUE 
+        BRA REG_MEM_SUB_ADDRVALUE 
    
-SUB_ADDRVALUE   MOVE.B  #14,D0
+REG_MEM_SUB_ADDRVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
         MOVE.B  #3,D0
         TRAP    #15
         SUB.W   D2,D3 
-        BRA     ADDR_RANGE  
+        BRA     REG_MEM_ADDR_RANGE  
         
-IND_ADDR MOVE.B  D4,D3
+REG_MEM_IND_ADDR MOVE.B  D4,D3
         AND.B   #$07,D3 * obtain address register number
         MOVE.B  D3,D6   * move to D6 for when we display register number
         
         ADDI.L  #$2,D5
         CMP.L   A6,D5
-        BGE     INVALID * opcode is out of bounds of memory we read  
+        BGE     REG_MEM_INVALID * opcode is out of bounds of memory we read  
         MOVEA.L  D5,A0  * move PC counter to an address register
         MOVE.W  (A0),D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
-        BEQ     INVALID
+        BEQ     REG_MEM_INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         CLR     D4
         LEA     ADDRPAREN,A2
         LEA     END_PAREN,A3
-        BRA     A_RANGE
+        BRA     REG_MEM_A_RANGE
 
-ABS_WORD ADDI.L  #$2,D5
+REG_MEM_ABS_WORD ADDI.L  #$2,D5
         CMP.L   A6,D5
-        BGE     INVALID * opcode is out of bounds of memory we read
+        BGE     REG_MEM_INVALID * opcode is out of bounds of memory we read
         MOVEA.L  D5,A0  * move PC counter to an address register
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
-        BEQ     INVALID
+        BEQ     REG_MEM_INVALID
         MOVEA.L A0,A4
         MOVE.W  (A4)+,D4 * put absolute word address in D4
         CMP.L   A6,A4   * word is past ending memory address given by user
-        BGT     INVALID
+        BGT     REG_MEM_INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
         CMP.W   #$0000,D4
-        BEQ     DISP_ADD
+        BEQ     REG_MEM_DISP_ADD
         MOVE.B  #$8,D6
         CLR     D4
-        BRA     A_RANGE
+        BRA     REG_MEM_A_RANGE
         
-ABS_LONG  ADDI.L  #$2,D5
+REG_MEM_ABS_LONG  ADDI.L  #$2,D5
         CMP.L   A6,D5
-        BGE     INVALID * opcode is out of bounds of memory we read
+        BGE     REG_MEM_INVALID * opcode is out of bounds of memory we read
         MOVEA.L  D5,A0  * move PC counter to an address register
         MOVE.W  (A0)+,D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
-        BEQ     INVALID
+        BEQ     REG_MEM_INVALID
         MOVEA.L A0,A4
         MOVE.L  (A4)+,D4 * put absolute word address in D4
         CMP.L   A6,A4   * word is past ending memory address given by user
-        BGT     INVALID
+        BGT     REG_MEM_INVALID
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
         CMP.L   #$00000000,D4
-        BEQ     DISP_LONG
+        BEQ     REG_MEM_DISP_LONG
         MOVE.B  #$9,D6
         CLR     D4
-        BRA     A_RANGE
+        BRA     REG_MEM_A_RANGE
   
         
-DISP_ADD    LEA ZERO_ADD,A3
+REG_MEM_DISP_ADD    LEA ZERO_ADD,A3
         CLR     D4
-        BRA     A_RANGE
+        BRA     REG_MEM_A_RANGE
 
-DISP_LONG   LEA LONG_ADD,A3
+REG_MEM_DISP_LONG   LEA LONG_ADD,A3
         CLR     D4
-        BRA     A_RANGE     
+        BRA     REG_MEM_A_RANGE     
 
-A_RANGE CMP.L    #$0100,D3
-        BLT D_RANGE
+REG_MEM_A_RANGE CMP.L    #$0100,D3
+        BLT REG_MEM_D_RANGE
         
         * we compare the register range with each possible value
         * and display the register in the output
@@ -267,64 +267,64 @@ A_RANGE CMP.L    #$0100,D3
         MOVE.W  #$8000,D2
         MOVE.W  #$7,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$4000,D2
         MOVE.W  #$6,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$2000,D2
         MOVE.W  #$5,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$1000,D2
         MOVE.W  #$4,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$0800,D2
         MOVE.W  #$3,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$0400,D2
         MOVE.W  #$2,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$0200,D2
         MOVE.W  #$1,D7
         CMP.L   D2,D3
-        BGE     MIN_A
+        BGE     REG_MEM_MIN_A
         
         MOVE.W  #$0100,D2
         MOVE.W  #$0,D7
         CMP.L   D2,D3
-        BGE     MIN_A   
+        BGE     REG_MEM_MIN_A   
 
-MIN_A   CMP.B   #$00,D4
-        BEQ FIRST_AREG
-        BRA A_SLASH
+REG_MEM_MIN_A   CMP.B   #$00,D4
+        BEQ REG_MEM_FIRST_AREG
+        BRA REG_MEM_A_SLASH
         
-A_SLASH LEA   ADDR_SLASH,A1       
-        BRA SUB_AVALUE 
+REG_MEM_A_SLASH LEA   ADDR_SLASH,A1       
+        BRA REG_MEM_SUB_AVALUE 
 
-FIRST_AREG MOVE.W  #$0001,D4
+REG_MEM_FIRST_AREG MOVE.W  #$0001,D4
         LEA ADDR_REG,A1
-        BRA SUB_AVALUE 
+        BRA REG_MEM_SUB_AVALUE 
         
-SUB_AVALUE   MOVE.B  #14,D0
+REG_MEM_SUB_AVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
         MOVE.B  #3,D0
         TRAP    #15
         SUB.W   D2,D3 
-        BRA     A_RANGE
+        BRA     REG_MEM_A_RANGE
       
-D_RANGE CMP.L    #$0000,D3
-        BEQ PRINT
+REG_MEM_D_RANGE CMP.L    #$0000,D3
+        BEQ REG_MEM_PRINT
         
         * we compare the register range with each possible value
         * and display the register in the output
@@ -332,95 +332,96 @@ D_RANGE CMP.L    #$0000,D3
         MOVE.W  #$0080,D2
         MOVE.W  #$7,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0040,D2
         MOVE.W  #$6,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0020,D2
         MOVE.W  #$5,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0010,D2
         MOVE.W  #$4,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0008,D2
         MOVE.W  #$3,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0004,D2
         MOVE.W  #$2,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0002,D2
         MOVE.W  #$1,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
         
         MOVE.W  #$0001,D2
         MOVE.W  #$0,D7
         CMP.L   D2,D3
-        BGE     MIN_D
+        BGE     REG_MEM_MIN_D
   
-MIN_D   CMP.B   #$00,D4
-        BEQ FIRSTD_REG
-        BRA ADDD_SLASH
+REG_MEM_MIN_D   CMP.B   #$00,D4
+        BEQ REG_MEM_FIRSTD_REG
+        BRA REG_MEM_ADDD_SLASH
 
-ADDD_SLASH LEA   DATA_SLASH,A1       
-        BRA SUB_DVALUE 
+REG_MEM_ADDD_SLASH LEA   DATA_SLASH,A1       
+        BRA REG_MEM_SUB_DVALUE 
 
-FIRSTD_REG MOVE.W  #$0001,D4
+REG_MEM_FIRSTD_REG MOVE.W  #$0001,D4
         LEA DATA_REG,A1
-        BRA SUB_DVALUE 
+        BRA REG_MEM_SUB_DVALUE 
    
-SUB_DVALUE   MOVE.B  #14,D0
+REG_MEM_SUB_DVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
         MOVE.B  #3,D0
         TRAP    #15
         SUB.W   D2,D3 
-        BRA     D_RANGE  
+        BRA     REG_MEM_D_RANGE  
         
-PRINT   MOVEA   A2,A1
+REG_MEM_PRINT   MOVEA   A2,A1
         MOVE.B  #14,D0
         TRAP    #15
         CMP.B   #$8,D6
-        BEQ     WORD_END
+        BEQ     REG_MEM_WORD_END
         CMP.B   #$9,D6
-        BEQ     LONG_END
+        BEQ     REG_MEM_LONG_END
         MOVE.B  D6,D1
         MOVE.B  #3,D0
         TRAP    #15
         
-FINAL   MOVEA   A3,A1
+REG_MEM_FINAL   MOVEA   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  #$4,D6
-        BRA     DONE
+        BRA     REG_MEM_DONE
 
-WORD_END    MOVE.W  (A0),D1
+REG_MEM_WORD_END    MOVE.W  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
         MOVE.W  #$6,D6  * displacement value stored in D6
-        BRA     DONE
+        BRA     REG_MEM_DONE
  
-LONG_END    MOVE.L  (A0),D1
+REG_MEM_LONG_END    MOVE.L  (A0),D1
         MOVE.B  #3,D0
         TRAP    #15
         MOVE.W  #$8,D6  * displacement value stored in D6
-        BRA     DONE
+        BRA     REG_MEM_DONE
   
-INVALID MOVE.B  #$1,D6  * indicates invalid opcode, impossible to have displacement of 1
-        BRA     DONE    * perform RTS
+REG_MEM_INVALID JSR   INVALID
+            BRA     REG_MEM_DONE
         
-DONE    RTS
+REG_MEM_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
+            RTS     *Return to subroutine here
 
     SIMHALT             ; halt simulator
 
@@ -442,3 +443,8 @@ LONG_ADD    DC.B    '0000000'   ,0
     END    REG_MEM        ; last line of source
 
 
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~

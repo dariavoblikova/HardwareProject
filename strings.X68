@@ -17,10 +17,10 @@ InvAddresses                    DC.B    'Starting address has to be less than an
 OddAddrErr                      DC.B    'Provided addresses have to be even. Try again! ',CR,LF,0
 
 ; Bcc.X68
-INV_BCC_MESSAGE                 DC.B    'Not a valid Bcc opcode',0
 
 ; common
 NEWL                            DC.B    '',CR,LF,0
+
 
 
 

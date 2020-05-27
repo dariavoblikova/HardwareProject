@@ -20,9 +20,20 @@ MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print tab
             
-            JSR         NOP_RTS_JSR                 * Branch to NOP_RTS_JSR subroutine. TODO: ADD Hex Groups
-            ADDA.L      D6, A5                      * Add displacent located in D6 to our current address
-            
+            MOVE.W      D4,D3                   * use D3 for masking so we don't lose opcode in D4
+            ANDI.W      #$FF00,D3               * mask word to look at leftmost byte
+            CMP.W       #$4E00,D3               * check if word could be a NOP, JSR, or RTS opcode
+            BEQ         FOUREOP                 * branch to call subroutine that decodes this opcode
+        
+FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
+            CMP.W       #$1,D6                  * our check to see if opcode was invalid
+            BEQ         EXIT_MAIN_LOOP          * if not equal, we decoded opcode and can leave subroutine
+* this can be the format for the rest of the file, HEXGROUP continuously masks word and sees if 
+* it matches with opcode(s), branch to label if equal to do a JSR. Then, check if displacement is
+* set to 1, if so, we know the opcode was invalid, so we either keep moving through the code if 
+* there is a chance the opcode could be found somewhere else, or we leave subroutine to print
+* error message.
+
             LEA         NEWLINE,A1                  * Print new line
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
@@ -58,6 +69,15 @@ EXIT_MAIN_LOOP  MOVEM.L     (SP)+, D0-D7/A0-A6      * pop the registers back
           
 NEWLINE       DC.B    '',CR,LF,0
 TAB           DC.B    '    ',0
+    
+    INCLUDE 'strings.X68'                   Put all the strings here and give them good names
+
+    INCLUDE 'INVALID.X68'
+    INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
+    INCLUDE 'SHIFT_OPCODES.X68'
+    INCLUDE 'Bcc.X68'                         Decoding Branch Opcodes
+    INCLUDE 'REG_MEM.X68'
+    INCLUDE 'MEM_REG.X68'
 
         * INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
 
@@ -65,6 +85,12 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
+
+
+
+
 
 
 
