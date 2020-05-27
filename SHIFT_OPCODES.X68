@@ -45,7 +45,7 @@ NOTEA  MOVE.B   D4,D3
     BEQ     ARITHMETIC
     CMP.B   #$18,D3
     BEQ     ROTATE
-    CMP.B   #$01,D3
+    CMP.B   #$08,D3
     BEQ     LOGICAL
     BRA     INVALID
       
