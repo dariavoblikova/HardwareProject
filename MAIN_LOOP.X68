@@ -20,14 +20,61 @@ MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print tab
             
+            * check if NOP/JSR/RTS opcode
+=======
+>>>>>>> f9b9d81fc77155ff48b8996dfba2b1b819e6cf7a
             MOVE.W      D4,D3                   * use D3 for masking so we don't lose opcode in D4
             ANDI.W      #$FF00,D3               * mask word to look at leftmost byte
             CMP.W       #$4E00,D3               * check if word could be a NOP, JSR, or RTS opcode
             BEQ         FOUREOP                 * branch to call subroutine that decodes this opcode
+<<<<<<< HEAD
+            
+            
+            
+            * check for type of MOVEM
+            CMP.W       #$4800,D3
+            BEQ         REGMEMOP
+            
+            CMP.W       #$4C00,D3
+            BEQ         MEMREGOP
+            
+            * check if shift opcode (LSL,ROL,ASL)
+            MOVE.W      D4,D3
+            ANDI.W      #$F000,D3
+            CMP.W       #$E000,D3
+            BEQ         SHIFTOP  
+
+            * check if Bcc opcode
+            CMP.W       #$6000,D3
+            BEQ         BCCOP           
         
 FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
-            CMP.W       #$1,D6                  * our check to see if opcode was invalid
-            BEQ         EXIT_MAIN_LOOP          * if not equal, we decoded opcode and can leave subroutine
+            JSR         DISP1        
+            *BRA        branch to where we would print the error message
+            
+REGMEMOP    JSR         REG_MEM             * subroutine to decode one of three opcodes
+            JSR         DISP1        
+            *BRA        branch to where we would print the error message
+
+MEMREGOP    JSR         MEM_REG             * subroutine to decode one of three opcodes
+            JSR         DISP1        
+            *BRA        branch to where we would print the error message
+           
+BCCOP       JSR         BCC                     * jump to subroutine that decodes Bcc opcodes
+            JSR         DISP1
+            *BRA        branch to where we would print the error message
+
+SHIFTOP     JSR         SHIFT_OPCODES
+            JSR         DISP1
+            *BRA        branch to where we would print the error message
+
+* check if opcode was decoded or not
+DISP1       CMP.W       #$1,D6                  * our check to see if opcode was invalid
+            BNE         EXIT_MAIN_LOOP          * if not equal, we decoded opcode and can leave subroutine
+            RTS            
+
+
+
 * this can be the format for the rest of the file, HEXGROUP continuously masks word and sees if 
 * it matches with opcode(s), branch to label if equal to do a JSR. Then, check if displacement is
 * set to 1, if so, we know the opcode was invalid, so we either keep moving through the code if 
