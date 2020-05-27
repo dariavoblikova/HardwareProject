@@ -112,14 +112,7 @@ EXIT_MAIN_LOOP  MOVEM.L     (SP)+, D0-D7/A0-A6      * pop the registers back
 NEWLINE       DC.B    '',CR,LF,0
 TAB           DC.B    '    ',0
     
-    INCLUDE 'strings.X68'                   Put all the strings here and give them good names
-
-    INCLUDE 'INVALID.X68'
-    INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
-    INCLUDE 'SHIFT_OPCODES.X68'
-    INCLUDE 'Bcc.X68'                         Decoding Branch Opcodes
-    INCLUDE 'REG_MEM.X68'
-    INCLUDE 'MEM_REG.X68'
+    
 
         * INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
 
@@ -127,6 +120,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 

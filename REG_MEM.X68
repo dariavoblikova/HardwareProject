@@ -4,7 +4,6 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-    ORG    $1000
 REG_MEM:                  ; first instruction of program
     MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * Mask byte of opcode to figure out the size field
@@ -57,7 +56,7 @@ REG_MEM_PRE_DEC MOVE.B  D4,D3
         TRAP    #15   
         CLR     D4
         LEA     INDIRECT,A2
-        LEA     END_PAREN,A3
+        LEA     REND_PAREN,A3
         BRA     REG_MEM_DATA_RANGE   
 
 * find out range of data registers we are moving to memory        
@@ -206,7 +205,7 @@ REG_MEM_IND_ADDR MOVE.B  D4,D3
         TRAP    #15   
         CLR     D4
         LEA     ADDRPAREN,A2
-        LEA     END_PAREN,A3
+        LEA     REND_PAREN,A3
         BRA     REG_MEM_A_RANGE
 
 REG_MEM_ABS_WORD ADDI.L  #$2,D5
@@ -423,8 +422,6 @@ REG_MEM_INVALID JSR   INVALID
 REG_MEM_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
 
-    SIMHALT             ; halt simulator
-
 * Put variables and constants here
 WORD_LEN    DC.B    'MOVEM.W    ',0
 LONG_LEN    DC.B    'MOVEM.L    ',0
@@ -434,13 +431,15 @@ ADDR_SLASH  DC.B    '/A'         ,0
 ADDR_REG    DC.B    'A'          ,0
 INDIRECT    DC.B    ',-(A'       ,0
 ADDRPAREN   DC.B    ',(A'        ,0
-END_PAREN   DC.B    ')'          ,0
+REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    ',$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
 
 
-    END    REG_MEM        ; last line of source
+
+
+
 
 
 

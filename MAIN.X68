@@ -28,12 +28,18 @@ MAIN    ORG    $1000
     INCLUDE 'I_O_SUBROUTINE.X68'            I/O subroutines
     INCLUDE 'USERINPUT.X68'                 Get Adrresses AsciiToHex
     INCLUDE 'MAIN_LOOP.X68'                 Opcodes loop
+    INCLUDE 'strings.X68'                   Put all the strings here and give them good names
+    INCLUDE 'INVALID.X68'
+    INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
+    INCLUDE 'SHIFT_OPCODES.X68'
+    INCLUDE 'Bcc.X68'                         Decoding Branch Opcodes
+    INCLUDE 'REG_MEM.X68'  *caused errors, put in mainloop
+    INCLUDE 'MEM_REG.X68'  *caused errors, put in mainloop
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
-      
-    SIMHALT                                 ; halt simulator
+STOP    SIMHALT   
+        END    MAIN                             ; last line of source
 
-STOP:
-    END    MAIN                             ; last line of source
+
 
 
 

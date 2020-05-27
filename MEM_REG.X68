@@ -4,7 +4,7 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-    ORG    $1000
+
 MEM_REG:                  ; first instruction of program
     MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 
@@ -293,21 +293,21 @@ MEM_REG_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers b
 
 * Put variables and constants here
 COMMA_ADD   DC.B    ','          ,0
-WORD_LEN    DC.B    'MOVEM.W    ',0
-LONG_LEN    DC.B    'MOVEM.L    ',0
-DATA_SLASH  DC.B    '/D'         ,0
-DATA_REG    DC.B    'D'          ,0
-ADDR_SLASH  DC.B    '/A'         ,0
-ADDR_REG    DC.B    'A'          ,0
+*WORD_LEN    DC.B    'MOVEM.W    ',0
+*LONG_LEN    DC.B    'MOVEM.L    ',0
+*DATA_SLASH  DC.B    '/D'         ,0
+*DATA_REG    DC.B    'D'          ,0
+*ADDR_SLASH  DC.B    '/A'         ,0
+*ADDR_REG    DC.B    'A'          ,0
 POST_PLUS   DC.B    ')+,'        ,0
-ADDRPAREN   DC.B    '(A'         ,0
-END_PAREN   DC.B    '),'         ,0
-HEX_SYMB    DC.B    '$'          ,0
-ZERO_ADD    DC.B    '0000'        ,0
-LONG_ADD    DC.B    '00000000'    ,0
+*ADDRPAREN   DC.B    '(A'         ,0
+*END_PAREN   DC.B    '),'         ,0
+*HEX_SYMB    DC.B    '$'          ,0
+*ZERO_ADD    DC.B    '0000'        ,0
+*LONG_ADD    DC.B    '00000000'    ,0
 
 
-    END    MEM_REG        ; last line of source
+
 
 
 *~Font name~Courier New~
