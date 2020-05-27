@@ -32,11 +32,17 @@ MAIN    ORG    $1000
     INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
     INCLUDE 'strings.X68'                   Put all the strings here and give them good names
-      
+    INCLUDE 'ADD_SUBROUTINE.x68'
+    INCLUDE 'BCC_SUBROUTINE.x68'
+    INCLUDE 'HEXGROUP.X68'  
+    INCLUDE 'IO.x68'
+    
     SIMHALT                                 ; halt simulator
 
 STOP:
     END    MAIN                             ; last line of source
+
+
 
 
 

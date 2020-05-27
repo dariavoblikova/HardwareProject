@@ -24,6 +24,10 @@ NOP
     JSR       label1
     NOP
     RTS
+    ADD.W       D0,     D1
+    ADD.W       (A4)+,  D4
+    BEQ label1
+    BRA label1
 label1
     NOP
     RTS
@@ -36,6 +40,8 @@ label1
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 
 

@@ -1,10 +1,10 @@
 ; OpCodes
 opcode_MOVE	                    DC.B	'MOVE',0
 opcode_MOVEM                    DC.B	'MOVEM',0
-opcode_BRA                      DC.B    'BRA ',0
-opcode_BEQ                      DC.B    'BEQ ',0
-opcode_BLE                      DC.B    'BLE ',0
-opcode_BGT                      DC.B    'BGT ',0
+*opcode_BRA                      DC.B    'BRA ',0
+*opcode_BEQ                      DC.B    'BEQ ',0
+*opcode_BLE                      DC.B    'BLE ',0
+*opcode_BGT                      DC.B    'BGT ',0
 
 ; I_O_SUBROUTINE.X68
 FinishQuestionString            DC.B    'To finish type 1',CR,LF,0
@@ -21,6 +21,7 @@ INV_BCC_MESSAGE                 DC.B    'Not a valid Bcc opcode',0
 
 ; common
 NEWL                            DC.B    '',CR,LF,0
+
 
 
 

@@ -11,23 +11,24 @@ CR      EQU     $0D
 LF      EQU     $0A
 
 MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers 
-            CMPA.L      A5,A6                       * A6-A5
+MAIN_LOOPS  CMPA.L      A5,A6                       * A6-A5
             BLE         EXIT_MAIN_LOOP              * IF A6<=A5, we are done
             JSR         PRINT_CURR_ADDR             * Print current memory location to the console
             MOVE.W      (A5),D4                     * Load opcode word to D4, subroutines use it
+            MOVE.L      A5, D5
             
             LEA         TAB,A1                      * Print tab
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print tab
             
-            JSR         NOP_RTS_JSR                 * Branch to NOP_RTS_JSR subroutine. TODO: ADD Hex Groups
+            BSR         HEXGROUP               
             ADDA.L      D6, A5                      * Add displacent located in D6 to our current address
             
             LEA         NEWLINE,A1                  * Print new line
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
 
-            BRA         MAIN_LOOP                   * If not done yet, branch to MAIN_LOOP
+            BRA         MAIN_LOOPS                   * If not done yet, branch to MAIN_LOOP
         
 PRINT_CURR_ADDR
             MOVEM.L     D0-D7/A0-A6, -(SP)          * Save all registers 
@@ -65,6 +66,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 

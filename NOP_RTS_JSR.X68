@@ -37,17 +37,17 @@ NOP_RTS_JSR:                  ; first instruction of program
     
 * tell user that this isn't a valid opcode   
 INVALID     LEA INV_M,A1
-            BRA PRINT
+            BRA NRJ_PRINT
 
 * will print out that this is an NOP opcode   
 NOP_CASE    MOVE.B  #$2,D6  * store displacement in D6
             LEA NOP_M,A1
-            BRA PRINT
+            BRA NRJ_PRINT
             
 * will print out that this is an RTS opcode   
 RTS_CASE    MOVE.B  #$2,D6  * store displacement in D6
             LEA RTS_M,A1
-            BRA PRINT
+            BRA NRJ_PRINT
 
 * finds effective address of JSR opcode, if valid at all            
 JSR_CASE    MOVE.B  D4,D3
@@ -114,7 +114,7 @@ ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
             
             BRA     DONE
            
-PRINT       MOVE.B  #14,D0
+NRJ_PRINT       MOVE.B  #14,D0
             TRAP    #15
     
    
@@ -132,6 +132,8 @@ HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
     * END    NOP_RTS_JSR        ; last line of source
+
+
 
 
 

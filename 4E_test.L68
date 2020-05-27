@@ -1,6 +1,6 @@
 00009000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/26/2020 12:28:01 AM
+Created On: 5/26/2020 7:31:09 PM
 
 00000000                             1  *****************************
 00000000                             2  *
@@ -25,21 +25,25 @@ Created On: 5/26/2020 12:28:01 AM
 00009006  4E90                      21      JSR       (A0)
 00009008  4EB8 1234                 22      JSR       $1234
 0000900C  4EB9 12345678             23      JSR       $12345678
-00009012  4EB9 0000901C             24      JSR       label1
+00009012  4EB9 00009028             24      JSR       label1
 00009018  4E71                      25      NOP
 0000901A  4E75                      26      RTS
-0000901C                            27  label1
-0000901C  4E71                      28      NOP
-0000901E  4E75                      29      RTS
-00009020  4EB9 0000901C             30      JSR       label1
-00009026                            31  
-00009026                            32  * Put program code here
-00009026                            33  
-00009026  FFFF FFFF                 34      SIMHALT             ; halt simulator
-0000902A                            35  
-0000902A                            36  * Put variables and constants here
-0000902A                            37  
-0000902A                            38      END    START        ; last line of source
+0000901C  D240                      27      ADD.W       D0,     D1
+0000901E  D85C                      28      ADD.W       (A4)+,  D4
+00009020  6700 0006                 29      BEQ label1
+00009024  6000 0002                 30      BRA label1
+00009028                            31  label1
+00009028  4E71                      32      NOP
+0000902A  4E75                      33      RTS
+0000902C  4EB9 00009028             34      JSR       label1
+00009032                            35  
+00009032                            36  * Put program code here
+00009032                            37  
+00009032  FFFF FFFF                 38      SIMHALT             ; halt simulator
+00009036                            39  
+00009036                            40  * Put variables and constants here
+00009036                            41  
+00009036                            42      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -48,6 +52,6 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-LABEL1              901C
+LABEL1              9028
 NOP                 9000
 START               9000
