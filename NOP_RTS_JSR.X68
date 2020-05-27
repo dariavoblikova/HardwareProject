@@ -7,7 +7,7 @@
 *    ORG    $2000 starting address determined by the user
 
 NOP_RTS_JSR:                  ; first instruction of program
-    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
+    *MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * Enter this subroutine when we know we have a subroutine (RTS, JSR) or NOP
 * instruction that we want to decode. That is if the first byte is 4E.
 * Assuming that a word was given to us hexadecimal in data register 4.
@@ -40,12 +40,12 @@ SUB_INVALID    JSR     INVALID
             BRA     JSR_END
 
 * will print out that this is an NOP opcode   
-NOP_CASE    MOVE.B  #$2,D6  * store displacement in D6
+NOP_CASE    MOVE.W  #$2,D6  * store displacement in D6
             LEA NOP_M,A1
             BRA JSR_PRINT
             
 * will print out that this is an RTS opcode   
-RTS_CASE    MOVE.B  #$2,D6  * store displacement in D6
+RTS_CASE    MOVE.W  #$2,D6  * store displacement in D6
             LEA RTS_M,A1
             BRA JSR_PRINT
 
@@ -59,7 +59,7 @@ JSR_CASE    MOVE.B  D4,D3
             BRA     SUB_INVALID
 
 * check for address register we are using for EA
-JSR_INDIRECT    MOVE.B  #$2,D6  * store displacement in D6
+JSR_INDIRECT    MOVE.W  #$2,D6  * store displacement in D6
             MOVE.B  D4,D3
             AND.B   #$07,D3
             MOVE.B  D3,D1
@@ -88,13 +88,13 @@ JSR_ABSOLUTE    MOVE.B  D4,D3
             BEQ     JSR_LONG
             BRA     SUB_INVALID
             
-JSR_WORD        MOVE.B  #$4,D6  * store displacement in D6
+JSR_WORD        MOVE.W  #$4,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.W  (A0),D3
             BRA     JSR_ABS_PRINT            
 
-JSR_LONG        MOVE.B  #$6,D6  * store displacement in D6
+JSR_LONG        MOVE.W  #$6,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.L  (A0),D3
@@ -116,7 +116,7 @@ JSR_ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
            
 JSR_PRINT       MOVE.B  #14,D0
             TRAP    #15
-JSR_END            MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
+JSR_END            *MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
     
     * SIMHALT             ; halt simulator
@@ -133,16 +133,3 @@ INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
     * END    NOP_RTS_JSR        ; last line of source
 
 
-
-
-
-
-
-
-
-
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
