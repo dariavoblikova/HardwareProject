@@ -11,7 +11,7 @@ CR      EQU     $0D
 LF      EQU     $0A
 
 MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers 
-            CMPA.L      A5,A6                       * A6-A5
+MAIN_LOOPS  CMPA.L      A5,A6                       * A6-A5 (MAIN_LOOPS for MAIN_LOOP start, fixes stack issue with saving each loop)
             BLE         EXIT_MAIN_LOOP              * IF A6<=A5, we are done
             JSR         PRINT_CURR_ADDR             * Print current memory location to the console
             MOVE.W      (A5),D4                     * Load opcode word to D4, subroutines use it
@@ -41,33 +41,41 @@ MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers
 
             * check if Bcc opcode
             CMP.W       #$6000,D3
-            BEQ         BCCOP           
+            BEQ         BCCOP    
+
+LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
+            BEQ         ERROR
+            ADD.L       D6, A5
+            LEA         NEWLINE,A1                  * Print new line
+            MOVE.B      #14,D0                      * Stores task 14 in D0
+            TRAP        #15                         * Task 15, print new line
+            BRA MAIN_LOOPS
+
+       
         
 FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
-            JSR         DISP1        
-            *BRA        branch to where we would print the error message
+            JSR         LOOP_CHECK        
             
 REGMEMOP    JSR         REG_MEM             * subroutine to decode one of three opcodes
-            JSR         DISP1        
-            *BRA        branch to where we would print the error message
+            JSR         LOOP_CHECK         
 
 MEMREGOP    JSR         MEM_REG             * subroutine to decode one of three opcodes
-            JSR         DISP1        
-            *BRA        branch to where we would print the error message
+            JSR         LOOP_CHECK         
            
 BCCOP       JSR         BCC                     * jump to subroutine that decodes Bcc opcodes
-            JSR         DISP1
-            *BRA        branch to where we would print the error message
+            JSR         LOOP_CHECK 
 
 SHIFTOP     JSR         SHIFT_OPCODES
-            JSR         DISP1
-            *BRA        branch to where we would print the error message
+            JSR         LOOP_CHECK 
 
-* check if opcode was decoded or not
-DISP1       CMP.W       #$1,D6                  * our check to see if opcode was invalid
-            BNE         EXIT_MAIN_LOOP          * if not equal, we decoded opcode and can leave subroutine
-            RTS            
 
+ERROR:      LEA GENERAL_ERROR, A1                           * general error message
+            MOVE.B      #14,D0                      * Stores task 14 in D0
+            TRAP        #15                         * Task 15, print new line
+            MOVE.B      #6,D0
+            RTS
+
+            
 
 
 * this can be the format for the rest of the file, HEXGROUP continuously masks word and sees if 
@@ -75,12 +83,6 @@ DISP1       CMP.W       #$1,D6                  * our check to see if opcode was
 * set to 1, if so, we know the opcode was invalid, so we either keep moving through the code if 
 * there is a chance the opcode could be found somewhere else, or we leave subroutine to print
 * error message.
-
-            LEA         NEWLINE,A1                  * Print new line
-            MOVE.B      #14,D0                      * Stores task 14 in D0
-            TRAP        #15                         * Task 15, print new line
-
-            BRA         MAIN_LOOP                   * If not done yet, branch to MAIN_LOOP
         
 PRINT_CURR_ADDR
             MOVEM.L     D0-D7/A0-A6, -(SP)          * Save all registers 
@@ -120,6 +122,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 
