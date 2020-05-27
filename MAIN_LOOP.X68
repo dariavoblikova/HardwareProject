@@ -21,16 +21,11 @@ MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers
             TRAP        #15                         * Task 15, print tab
             
             * check if NOP/JSR/RTS opcode
-=======
->>>>>>> f9b9d81fc77155ff48b8996dfba2b1b819e6cf7a
             MOVE.W      D4,D3                   * use D3 for masking so we don't lose opcode in D4
             ANDI.W      #$FF00,D3               * mask word to look at leftmost byte
             CMP.W       #$4E00,D3               * check if word could be a NOP, JSR, or RTS opcode
             BEQ         FOUREOP                 * branch to call subroutine that decodes this opcode
-<<<<<<< HEAD
-            
-            
-            
+                       
             * check for type of MOVEM
             CMP.W       #$4800,D3
             BEQ         REGMEMOP
