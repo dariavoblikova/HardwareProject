@@ -47,7 +47,7 @@ MOVEQ_DATA  MOVE.L  D4,D3
 INVALID_MOVEQ * JSR   INVALID
         RTS
   
-    SIMHALT             ; halt simulator
+    *SIMHALT             ; halt simulator
 
 * Put variables and constants here
 MOVEQ_CODE  DC.B    'MOVEQ  ',0
@@ -55,7 +55,7 @@ MOVEQ_DREG  DC.B    'D',0
 MOVEQ_POUND DC.B    '#',0
 MOVEQ_COMMA DC.B    ',',0
 
-    END    MOVEQ        ; last line of source
+    *END    MOVEQ        ; last line of source
 
 *~Font name~Courier New~
 *~Font size~10~
