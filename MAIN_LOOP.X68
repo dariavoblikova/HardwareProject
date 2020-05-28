@@ -58,6 +58,9 @@ MAIN_LOOPS  MOVE.L      A5,D5
             *check if OR opcode
             CMP.W   #$8000, D3
             BEQ ADDOP
+            *check if ADDQ opcode
+            CMP.W   #$5000, D3
+            BEQ ADDOP
             
             *check if MOVE opcode
             MOVE.W D4, D3
@@ -153,6 +156,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

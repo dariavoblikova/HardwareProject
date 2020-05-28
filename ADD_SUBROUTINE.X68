@@ -86,6 +86,7 @@ PI
         BEQ ADDAT       *if opmode == 3 then ADDA
         CMP.B #$07, D3
         BEQ ADDAT       *if opmode == 7 then ADDA
+        
 
         
         *determine ADD vs SUB*
@@ -96,6 +97,8 @@ PI
         BEQ IS_SUB
         CMP.W #$8000, D0
         BEQ IS_OR
+        CMP.W #$5000, D0    *if it's 5 then ADDQ
+        BEQ IS_ADDQ
         CMP.W #$C000, D0    *if it's AND then continue
         BNE IS_ADD          *otherwise it must be AND (not ADDA, SUB, AND, OR)
 IS_AND  LEA AND_ST, A1      
@@ -104,6 +107,8 @@ IS_OR   LEA OR_ST, A1
         BRA ADD_P
 IS_SUB  LEA SUBDOT, A1      *if so load 'SUB.' instead
         BRA ADD_P           *branch to ADD_PRINT which resets the stack and prints
+IS_ADDQ LEA ADDQ_ST, A1
+        BRA ADD_P
 IS_ADD  LEA ADDDOT, A1      *print 'ADD.'
 ADD_P   MOVE.L (SP)+, D0
         BSR PRINT
@@ -122,6 +127,14 @@ PT5     BSR PRINT
         LEA SPACE, A1
         BSR PRINT           * printed 'ADD.X '
         MOVE.B (SP)+, D3    *restore D3
+        
+        *check if ADDQ*
+        MOVE.L D0, -(SP)
+        MOVE.L D4, D0       *load opcode to D0
+        AND.W #$F000, D0    *mask first hex dig
+        CMP.W #$5000, D0
+        BEQ ADDQ_PRINT
+        MOVE.L (SP)+, D0
         
         CMP.B #$03, D3
         BGT DNDEST
@@ -164,6 +177,25 @@ ADDA_PRINT      LEA SPACE, A1
                 LEA ADISP, A1
                 BSR PRINT
                 BSR PRINTHEX
+                BRA ADD_END
+*D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode         for ADD
+*D0 = register ; D1 = EA reg ; D2 = EA mode ; D3 = opmode   for ADDQ
+ADDQ_PRINT      MOVE.L (SP)+, D0
+                LEA SPACE, A1
+                BSR PRINT
+                LEA POUND, A1
+                BSR PRINT
+                CMP.B #$00, D0      *if register is 0, ADDQ prints 8
+                BNE NOT_EIGHT
+                LEA HEX8, A1
+                BSR PRINT
+                BRA DONE_DATA
+NOT_EIGHT       BSR PRINTHEX        *otherwise print whatever's in D0         
+DONE_DATA       LEA COMMA, A1
+                BSR PRINT
+                LEA SPACE, A1
+                BSR PRINT
+                BSR EAPRINT
 ADD_END RTS
 * Put variables and constants here
 
@@ -213,6 +245,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 
