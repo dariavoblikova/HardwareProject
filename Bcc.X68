@@ -5,8 +5,8 @@
 * Description: Decodes word to identify the type of branching operation
 *-----------------------------------------------------------
 
-CR      EQU     $0D
-LF      EQU     $0A
+* CR      EQU     $0D
+* LF      EQU     $0A
 
 
 BCC:                  ; first instruction of program
@@ -118,6 +118,7 @@ BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back 
 
 
     *END    BCC        ; last line of source
+
 
 
 

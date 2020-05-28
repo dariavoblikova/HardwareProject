@@ -31,9 +31,10 @@ FINISH_PROGRAM:
 
 
 NULL    EQU 00
-CR      EQU $0D                             ;ASCII code for Carriage Return
-LF      EQU $0A                             ;ASCII code for Line Feed
+* CR      EQU $0D                             ;ASCII code for Carriage Return
+* LF      EQU $0A                             ;ASCII code for Line Feed
 * Put variables and constants here
+
 
 
 

@@ -7,8 +7,8 @@
 *-----------------------------------------------------------
     * ORG    $1000
     
-CR      EQU     $0D
-LF      EQU     $0A
+* CR      EQU     $0D
+* LF      EQU     $0A
 
 MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers 
 MAIN_LOOPS  MOVE.L      A5,D5
@@ -135,6 +135,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

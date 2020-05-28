@@ -289,7 +289,7 @@ MEM_REG_INVALID JSR     INVALID
 MEM_REG_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6  
              RTS
 
-    SIMHALT             ; halt simulator
+    * SIMHALT             ; halt simulator
 
 * Put variables and constants here
 COMMA_ADD   DC.B    ','          ,0
@@ -305,6 +305,7 @@ POST_PLUS   DC.B    ')+,'        ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
 
 
 

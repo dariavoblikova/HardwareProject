@@ -7,8 +7,8 @@
 * will be stored in D5 for starting address and in D6 for ending address and will be 
 * used by the main routine to start reading from memory and decoding opcodes.
 *-----------------------------------------------------------
-CR      EQU     $0D
-LF      EQU     $0A
+* CR      EQU     $0D
+* LF      EQU     $0A
 num     DS.L    $8700
 ex      DS.B    $00
 
@@ -137,6 +137,7 @@ SUCCESS_ADDR_INPUT
 * NEWL    DC.B    '',CR,LF,0
 
      * END         IO   ; last line of source
+
 
 
 
