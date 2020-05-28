@@ -17,7 +17,7 @@ NOP_RTS_JSR:                  ; first instruction of program
 * Put program code here
     * MOVE.W  D4,-(SP)    * move the word to the stack to analyze one byte at a time
     * CLR.W   D4          * clear the contents of D4
-    MOVE.W  D4,D3       * copy word to D3
+    MOVE.L  D4,D3       * copy word to D3
     AND.W   #$FF00,D3   * mask D3 to only read most significant byte
     CMP.W   #$4E00,D3   * check if this could be NOP, RTS, or JSR
     BNE     SUB_INVALID     * not a valid NOP, RTS, or JSR opcode    
@@ -40,17 +40,17 @@ SUB_INVALID    JSR     INVALID
             BRA     JSR_END
 
 * will print out that this is an NOP opcode   
-NOP_CASE    MOVE.W  #$2,D6  * store displacement in D6
+NOP_CASE    MOVE.L  #$2,D6  * store displacement in D6
             LEA NOP_M,A1
             BRA JSR_PRINT
             
 * will print out that this is an RTS opcode   
-RTS_CASE    MOVE.W  #$2,D6  * store displacement in D6
+RTS_CASE    MOVE.L  #$2,D6  * store displacement in D6
             LEA RTS_M,A1
             BRA JSR_PRINT
 
 * finds effective address of JSR opcode, if valid at all            
-JSR_CASE    MOVE.B  D4,D3
+JSR_CASE    MOVE.L  D4,D3
             AND.B   #$F8,D3     * mask D3, to check effective address mode
             CMP.B   #$90,D3   
             BEQ     JSR_INDIRECT    * if equal, we know address register indirect is EA
@@ -59,10 +59,10 @@ JSR_CASE    MOVE.B  D4,D3
             BRA     SUB_INVALID
 
 * check for address register we are using for EA
-JSR_INDIRECT    MOVE.W  #$2,D6  * store displacement in D6
-            MOVE.B  D4,D3
-            AND.B   #$07,D3
-            MOVE.B  D3,D1
+JSR_INDIRECT    MOVE.L  #$2,D6  * store displacement in D6
+            MOVE.L  D4,D3
+            AND.L  #$07,D3
+            MOVE.L  D3,D1
             
             LEA     JSR_M,A1 * print that this is a JSR opcode
             MOVE.B  #14,D0
@@ -80,21 +80,21 @@ JSR_INDIRECT    MOVE.W  #$2,D6  * store displacement in D6
             TRAP    #15
             BRA     JSR_END
             
-JSR_ABSOLUTE    MOVE.B  D4,D3
-            AND.B   #$07,D3
-            CMP.B   #$00,D3
+JSR_ABSOLUTE    MOVE.L  D4,D3
+            AND.L   #$07,D3
+            CMP.L   #$00,D3
             BEQ     JSR_WORD
-            CMP.B   #$01,D3
+            CMP.L   #$01,D3
             BEQ     JSR_LONG
             BRA     SUB_INVALID
             
-JSR_WORD        MOVE.W  #$4,D6  * store displacement in D6
+JSR_WORD        MOVE.L  #$4,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
-            MOVE.W  (A0),D3
+            MOVE.L  (A0),D3
             BRA     JSR_ABS_PRINT            
 
-JSR_LONG        MOVE.W  #$6,D6  * store displacement in D6
+JSR_LONG        MOVE.L  #$6,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.L  (A0),D3
@@ -133,3 +133,18 @@ INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
     * END    NOP_RTS_JSR        ; last line of source
 
 
+
+
+
+
+
+
+
+
+
+
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
