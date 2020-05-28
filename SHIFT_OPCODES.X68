@@ -202,7 +202,7 @@ PRINTABS MOVE.B #14,D0
         TRAP    #15
         LEA     SPACE,A1    * create empty space between opcode and operand
         TRAP    #15
-        MOVEA   A2,A1
+        MOVEA.L   A2,A1
         TRAP    #15
         MOVE.B  #3,D0
         TRAP    #15
@@ -212,11 +212,11 @@ PRINTIND MOVE.B #14,D0
         TRAP    #15
         LEA     SPACE,A1    * create empty space between opcode and operand
         TRAP    #15
-        MOVEA   A2,A1
+        MOVEA.L   A2,A1
         TRAP    #15
         MOVE.B  #3,D0
         TRAP    #15
-        MOVEA   A3,A1
+        MOVEA.L   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
         BRA     SHIFT_END
@@ -251,9 +251,9 @@ REGNUM  MOVE.B  D4,D3 * store copy in D3 for masking
 * print all information for opcode to console      
 SHIFT_PRINT   MOVE.B  #14,D0
         TRAP    #15     * display shift opcode
-        MOVEA   A2,A1   * move string representing size to A1
+        MOVEA.L   A2,A1   * move string representing size to A1
         TRAP    #15     * display size of opcode
-        MOVEA   A3,A1   * move string representing count/reg to A1
+        MOVEA.L   A3,A1   * move string representing count/reg to A1
         TRAP    #15     * display '#' or 'D'
         MOVE.B  #3,D0
         TRAP    #15     * display count/register number
@@ -291,6 +291,13 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
+
+
+
+
+
+
 
 
 
