@@ -18,6 +18,7 @@ PLUS        DC.B '+',0
 MINUS       DC.B '-',0
 HEXI        DC.B '#$',0
 MONEY       DC.B '$',0 
+ADDA_ST     DC.B 'ADDA.',0
 **********************REFER TO STRINGS************************
 *SPACE       DC.B ' ',0
 *COMMA       DC.B ',',0
@@ -424,6 +425,7 @@ PHTF    LEA     HEXF,   A1
 
 PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
+
 
 
 

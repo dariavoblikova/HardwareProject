@@ -38,7 +38,7 @@ ADD_SUBROUTINE:
 ************************************************************************    
 * increment parsing
 ************************************************************************
-        *if opmode < 5 then D6 is 4 (Dn, An, (An), (An)+, -(An))
+        *if ea mode < 5 then D6 is 2 (Dn, An, (An), (An)+, -(An))
         CMP.B   #$05,   D2
         BLT T
         BRA PT
@@ -53,14 +53,14 @@ PT      CMP.B   #$07,   D2  *if opmode == 7 then it's either abs w, abs l, or im
         BEQ T2
         BRA PT2
 *then
-T2      MOVE.B  #$03,   D6
+T2      MOVE.B  #$04,   D6
         BRA PI
 *post then
 PT2     CMP.B   #$01,   D1  *if reg == 1 ($.L)
         BEQ T3
         BRA PT3
 *then
-T3      MOVE.B  #$04,   D6
+T3      MOVE.B  #$06,   D6
         BRA PI
 *post then
 PT3     CMP.B   #$04,   D1  *if reg == 4 (#<>)
@@ -73,13 +73,13 @@ T4      AND.B #$03, D3  *only keep the last two bits
         BEQ     WORDT   * = 1 word.
         BGT     LONGT   * > 1 long.
 *if byte then
-BYTET   MOVE.B #$03, D6
+BYTET   MOVE.B #$04, D6
         BRA PT4
 *if word then
-WORDT   MOVE.B #$03, D6
+WORDT   MOVE.B #$04, D6
         BRA PT4
 *if long then
-LONGT   MOVE.B #$04, D6
+LONGT   MOVE.B #$06, D6
 PT4     MOVE.L  D4,     D3
         BSR     OPMODE_PARSE *reset D3
 *post increment parsing (section end)
@@ -98,13 +98,20 @@ PI
 ************************************************************************    
 * display
 ************************************************************************
+        CMP.B #$03, D3
+        BEQ ADDAT       *if opmode == 3 then ADDA
+        CMP.B #$07, D3
+        BEQ ADDAT       *if opmode == 7 then ADDA
+
+
         LEA ADDDOT, A1  *print 'ADD.'
         BSR PRINT
-        AND.B #$03, D3  *only keep the last two bits
+        MOVE.B  D3, -(SP)   *we're going to modify D3 so store it 
+        AND.B #$03, D3      *only keep the last two bits
         CMP.B #$01, D3  
-        BLT     BYTET2  * < 1 byte. print 'ADD.B'
-        BEQ     WORDT2  * = 1 word. print 'ADD.W'
-        BGT     LONGT2  * > 1 long. print 'ADD.L'
+        BLT     BYTET2      * < 1 byte. print 'ADD.B'
+        BEQ     WORDT2      * = 1 word. print 'ADD.W'
+        BGT     LONGT2      * > 1 long. print 'ADD.L'
 BYTET2  LEA BDISP, A1
         BRA PT5
 WORDT2  LEA WDISP, A1
@@ -112,7 +119,8 @@ WORDT2  LEA WDISP, A1
 LONGT2  LEA LDISP, A1  
 PT5     BSR PRINT
         LEA SPACE, A1
-        BSR PRINT       * printed 'ADD.X '
+        BSR PRINT           * printed 'ADD.X '
+        MOVE.B (SP)+, D3    *restore D3
         
         CMP.B #$03, D3
         BGT DNDEST
@@ -136,6 +144,25 @@ EADEST  BSR EAPRINT
         BSR PRINT
         *D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode 
         BSR PRINTHEX
+        BRA ADD_END
+        
+ADDAT           LEA ADDA_ST, A1       *ADDA section
+                BSR PRINT       
+                CMP.B #$03, D3        *if opmode = 3 then sign extended word
+                BNE ADDA_L_CHECK
+                LEA WDISP, A1
+                BSR PRINT
+                BRA ADDA_PRINT
+ADDA_L_CHECK    LEA LDISP, A1
+                BSR PRINT
+ADDA_PRINT      LEA SPACE, A1
+                BSR PRINT
+                BSR EAPRINT
+                LEA COMMA, A1
+                BSR PRINT
+                LEA ADISP, A1
+                BSR PRINT
+                BSR PRINTHEX
 ADD_END RTS
 * Put variables and constants here
 
@@ -185,6 +212,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 
