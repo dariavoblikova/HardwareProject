@@ -37,9 +37,11 @@ MAIN    ORG    $1000
     INCLUDE 'MEM_REG.X68'  *caused errors, put in mainloop
     INCLUDE 'IO.x68'
     INCLUDE 'ADD_SUBROUTINE.x68'
+    INCLUDE 'MOVE_SUBROUTINE.x68'
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
 
 
 

@@ -19,6 +19,7 @@ MINUS       DC.B '-',0
 HEXI        DC.B '#$',0
 MONEY       DC.B '$',0 
 ADDA_ST     DC.B 'ADDA.',0
+MOVE_ST     DC.B 'MOVE.',0
 **********************REFER TO STRINGS************************
 *SPACE       DC.B ' ',0
 *COMMA       DC.B ',',0
@@ -77,7 +78,7 @@ PRINT: MOVE.B D0, -(SP)     *push to stack
     
 
 **********CONTRACT**********
-*  INPUT:        D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode 
+*  INPUT:        D1 = EA reg ; D2 = EA mode ; D3 = opmode (size in ADD's opmode format) ; D5 = input program counter
 *  OPERATION:    Decides which EA is being used and prints accordingly, used in ADD_SUBROUTINE
 *  OUTPUT:       Prints based on EA
 *  this subroutine is flawed and needs improvements, namely when it errors it does so poorly
@@ -201,7 +202,7 @@ EAT7    LEA     MONEY,  A1  *it is $.W
         ADDI.L  #2,     D5 *compensate for opcode len
         MOVE.L  D5,     A0
         
-        MOVE.W  (A0),   D0
+        MOVE.L  (A0),   D0
         BSR     PRINTREG        *printreg prints all of D0 (long) as hex
         MOVE.L  (SP)+,   D0
         MOVE.L  (SP)+,   D5
@@ -425,6 +426,9 @@ PHTF    LEA     HEXF,   A1
 
 PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
+
+
+
 
 
 

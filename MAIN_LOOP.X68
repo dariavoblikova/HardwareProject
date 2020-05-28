@@ -49,10 +49,17 @@ MAIN_LOOPS  MOVE.L      A5,D5
             AND.W   #$F000, D3
             CMP.W   #$D000, D3
             BEQ ADDOP
-            BRA LOOP_CHECK
             
+            *check if MOVE opcode
+            MOVE.W D4, D3
+            AND.W   #$F000, D3
+            CMP.W   #$0000, D3
+            BEQ NOT_MOVE        *if =0 not ADD
+            CMP.W   #$3000, D3
+            BGT NOT_MOVE        *if >3 not ADD
+            BRA MOVEOP
             
-
+NOT_MOVE    *add another opcode here*
 LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
             BEQ         ERROR
             ADD.L       D6, A5
@@ -64,7 +71,9 @@ LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was
 
 ADDOP       JSR ADD_SUBROUTINE
             JSR LOOP_CHECK
-       
+
+MOVEOP      JSR MOVE_SUBROUTINE
+            JSR LOOP_CHECK       
         
 FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
             JSR         LOOP_CHECK        
@@ -135,6 +144,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 
