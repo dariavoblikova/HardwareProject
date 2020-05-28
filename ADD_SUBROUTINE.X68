@@ -93,8 +93,16 @@ PI
         MOVE.L D4, D0       *load opcode to D0
         AND.W #$F000, D0    *mask first hex dig
         CMP.W #$9000, D0    *9 in first hex dig is SUB
-        BNE IS_ADD          *if not ADD
-        LEA SUBDOT, A1      *if so load 'SUB.' instead
+        BEQ IS_SUB
+        CMP.W #$8000, D0
+        BEQ IS_OR
+        CMP.W #$C000, D0    *if it's AND then continue
+        BNE IS_ADD          *otherwise it must be AND (not ADDA, SUB, AND, OR)
+IS_AND  LEA AND_ST, A1      
+        BRA ADD_P        
+IS_OR   LEA OR_ST, A1
+        BRA ADD_P
+IS_SUB  LEA SUBDOT, A1      *if so load 'SUB.' instead
         BRA ADD_P           *branch to ADD_PRINT which resets the stack and prints
 IS_ADD  LEA ADDDOT, A1      *print 'ADD.'
 ADD_P   MOVE.L (SP)+, D0
@@ -205,6 +213,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 

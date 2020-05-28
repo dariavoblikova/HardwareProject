@@ -22,6 +22,8 @@ MONEY       DC.B '$',0
 ADDA_ST     DC.B 'ADDA.',0
 MOVE_ST     DC.B 'MOVE.',0
 MOVEA_ST    DC.B 'MOVEA.',0
+AND_ST      DC.B 'AND.',0
+OR_ST       DC.B 'OR.',0
 **********************REFER TO STRINGS************************
 *SPACE       DC.B ' ',0
 *COMMA       DC.B ',',0
@@ -428,6 +430,7 @@ PHTF    LEA     HEXF,   A1
 
 PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
+
 
 
 
