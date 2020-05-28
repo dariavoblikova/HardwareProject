@@ -5,8 +5,7 @@
 * Description: Decodes ROR, ROL, ASR, ASL, LSR, and LSL.
 *-----------------------------------------------------------
 
-SHIFT_OPCODES:                  ; first instruction of program
-
+SHIFT_OPCODES: MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * Put program code here
 * determine if there is an EA or not
 SHIFT_START    CLR     D7
@@ -292,6 +291,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 
