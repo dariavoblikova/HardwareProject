@@ -43,6 +43,15 @@ MAIN_LOOPS  MOVE.L      A5,D5
             * check if Bcc opcode
             CMP.W       #$6000,D3
             BEQ         BCCOP    
+            
+            *check if ADD opcode
+            MOVE.W  D4, D3
+            AND.W   #$F000, D3
+            CMP.W   #$D000, D3
+            BEQ ADDOP
+            BRA LOOP_CHECK
+            
+            
 
 LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
             BEQ         ERROR
@@ -52,6 +61,9 @@ LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was
             TRAP        #15                         * Task 15, print new line
             BRA MAIN_LOOPS
 
+
+ADDOP       JSR ADD_SUBROUTINE
+            JSR LOOP_CHECK
        
         
 FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
@@ -123,6 +135,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

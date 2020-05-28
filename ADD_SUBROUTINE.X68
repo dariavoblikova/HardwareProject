@@ -136,8 +136,7 @@ EADEST  BSR EAPRINT
         BSR PRINT
         *D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode 
         BSR PRINTHEX
-        BRA ADD_END
-
+ADD_END RTS
 * Put variables and constants here
 
 **********CONTRACT**********
@@ -182,16 +181,12 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
         LEA RERROR, A1
         BSR PRINT
         BRA ADD_END        
-EAMODE_ERROR: ADD.L #4, (SP) *eamode only gets called in subroutine, must do this to maintain stack
-        LEA EAMODERROR, A1
-        BSR PRINT
-        BRA ADD_END
         
-ADD_END: LEA  LN, A1
-        BSR PRINT
-        RTS
+
     *SIMHALT
     *;END    START        ; last line of source
+
+
 
 
 
