@@ -6,31 +6,15 @@
 * been identified as an ADD for EA and other details, and 
 * displays what can be deduced about the original command.
 *-----------------------------------------------------------
-*    ORG    $1000
-*START:                  ; first instruction of program
 ADD_SUBROUTINE:
-************************************************************************ 
-*load test data to mimic main routine contract
-************************************************************************ 
-*D4: Opcode D5: Input Program PC A6: Input Program ending address
-        *add an immediate long to D2 = D4BC
-        *add an immediate word to D2 = D47C
-        *add an immediate byte to D2 = D43C
-        *add an long from D3 to A $.W address = D6B8
-        *MOVE.W  #$D6B8,     D4  
-        *MOVE.L  #$00007336, D5  *vegeta, what does the scouter say about his power level?
-        *MOVEA.L #$00009001, A6  */cronch/ it's over 9000!
-        *MOVE.L  #$D43C0012, $00007336
-        *MOVE.L  #$3456789A, $0000733A
-        
 ************************************************************************    
 * initial parsing: D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode
 ************************************************************************
-        MOVE.L  D4,     D0
-        MOVE.L  D4,     D1
-        MOVE.L  D4,     D2
-        MOVE.L  D4,     D3
-        BSR     DREG_PARSE
+        MOVE.L  D4,     D0      *Dn
+        MOVE.L  D4,     D1      *EA register
+        MOVE.L  D4,     D2      *EA mode
+        MOVE.L  D4,     D3      *opmode (size)
+        BSR     DREG_PARSE      *parse above labels
         BSR     REG_PARSE
         BSR     MODE_PARSE
         BSR     OPMODE_PARSE
@@ -103,8 +87,17 @@ PI
         CMP.B #$07, D3
         BEQ ADDAT       *if opmode == 7 then ADDA
 
-
-        LEA ADDDOT, A1  *print 'ADD.'
+        
+        *determine ADD vs SUB*
+        MOVE.L D0, -(SP)    *store val on stack
+        MOVE.L D4, D0       *load opcode to D0
+        AND.W #$F000, D0    *mask first hex dig
+        CMP.W #$9000, D0    *9 in first hex dig is SUB
+        BNE IS_ADD          *if not ADD
+        LEA SUBDOT, A1      *if so load 'SUB.' instead
+        BRA ADD_P           *branch to ADD_PRINT which resets the stack and prints
+IS_ADD  LEA ADDDOT, A1      *print 'ADD.'
+ADD_P   MOVE.L (SP)+, D0
         BSR PRINT
         MOVE.B  D3, -(SP)   *we're going to modify D3 so store it 
         AND.B #$03, D3      *only keep the last two bits
@@ -212,6 +205,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 

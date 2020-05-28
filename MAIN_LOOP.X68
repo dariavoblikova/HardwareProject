@@ -49,6 +49,9 @@ MAIN_LOOPS  MOVE.L      A5,D5
             AND.W   #$F000, D3
             CMP.W   #$D000, D3
             BEQ ADDOP
+            *check if SUB opcode
+            CMP.W   #$9000, D3  *almost over 9000
+            BEQ ADDOP   *SUB included in ADD as they're the same other than first hex digi 
             
             *check if MOVE opcode
             MOVE.W D4, D3
@@ -144,6 +147,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

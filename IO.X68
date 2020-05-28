@@ -10,6 +10,7 @@ BDISP       DC.B 'B',0
 WDISP       DC.B 'W',0
 LDISP       DC.B 'L',0
 ADDDOT      DC.B 'ADD.',0
+SUBDOT      DC.B 'SUB.',0
 ADISP       DC.B 'A',0
 DDISP       DC.B 'D',0
 OPAREN      DC.B '(',0
@@ -427,6 +428,7 @@ PHTF    LEA     HEXF,   A1
 
 PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
+
 
 
 
