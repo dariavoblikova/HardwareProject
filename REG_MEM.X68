@@ -387,7 +387,7 @@ REG_MEM_SUB_DVALUE   MOVE.B  #14,D0
         SUB.W   D2,D3 
         BRA     REG_MEM_D_RANGE  
         
-REG_MEM_PRINT   MOVEA   A2,A1
+REG_MEM_PRINT   MOVEA.L   A2,A1
         MOVE.B  #14,D0
         TRAP    #15
         CMP.B   #$8,D6
@@ -398,7 +398,7 @@ REG_MEM_PRINT   MOVEA   A2,A1
         MOVE.B  #3,D0
         TRAP    #15
         
-REG_MEM_FINAL   MOVEA   A3,A1
+REG_MEM_FINAL   MOVEA.L   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  #$4,D6
@@ -435,6 +435,7 @@ REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    ',$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
+
 
 
 

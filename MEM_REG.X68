@@ -142,12 +142,12 @@ MEM_REG_REG_RANGE MOVE.B  D4,D3 * move opcode word to D3
         MOVE.B  #14,D0  * starting print MOVEM opcode
         TRAP    #15
         * print address register (indirect post-increment or regular increment)  
-        MOVEA   A2,A1   
+        MOVEA.L   A2,A1   
         TRAP    #15
         MOVE.B  #3,D0   * print register number
         TRAP    #15
         
-        MOVEA   A3,A1
+        MOVEA.L   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
         CLR     D4      * clear D4 for further use
@@ -305,6 +305,7 @@ POST_PLUS   DC.B    ')+,'        ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
 
 
 
