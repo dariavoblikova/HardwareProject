@@ -63,6 +63,7 @@ MEM_REG_ABS_WORD ADDI.L  #$2,D5
         MOVE.W  (A0)+,D1 * put absolute word address in D4
         CMP.L   A6,A0   * word is past ending memory address given by user
         BGT     MEM_REG_INVALID
+        MOVE.L  #$6,D6 * store displacement in D6
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A1
@@ -90,6 +91,7 @@ MEM_REG_ABS_LONG  ADDI.L  #$2,D5
         MOVE.L  (A0)+,D1 * put absolute word address in D4
         CMP.L   A6,A0
         BGT     MEM_REG_INVALID
+        MOVE.L  #$8,D6  * store displacement in D6
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A1
@@ -139,6 +141,7 @@ MEM_REG_REG_RANGE MOVE.B  D4,D3 * move opcode word to D3
         MOVE.W  (A0),D3 * move word representing register range to D3
         CMP.W   #$0000,D3  
         BEQ     MEM_REG_INVALID * if range is 0000, then there are no registers
+        MOVE.L  #$4,D6  * store displacement in D6
         MOVE.B  #14,D0  * starting print MOVEM opcode
         TRAP    #15
         * print address register (indirect post-increment or regular increment)  
