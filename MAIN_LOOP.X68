@@ -51,7 +51,7 @@ MAIN_LOOPS  MOVE.L      A5,D5
             BEQ ADDOP
             *check if SUB opcode
             CMP.W   #$9000, D3  *almost over 9000
-            BEQ ADDOP   *SUB included in ADD as they're the same other than first hex digi 
+            BEQ ADDOP           *SUB included in ADD as they're the same other than first hex digit
             *check if AND opcode
             CMP.W   #$C000, D3
             BEQ ADDOP
@@ -82,25 +82,25 @@ LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was
 
 
 ADDOP       JSR ADD_SUBROUTINE
-            JSR LOOP_CHECK
+            BRA LOOP_CHECK
 
 MOVEOP      JSR MOVE_SUBROUTINE
-            JSR LOOP_CHECK       
+            BRA  LOOP_CHECK       
         
 FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
-            JSR         LOOP_CHECK        
+            BRA         LOOP_CHECK        
             
 REGMEMOP    JSR         REG_MEM             * subroutine to decode one of three opcodes
-            JSR         LOOP_CHECK         
+            BRA         LOOP_CHECK         
 
 MEMREGOP    JSR         MEM_REG             * subroutine to decode one of three opcodes
-            JSR         LOOP_CHECK         
+            BRA         LOOP_CHECK         
            
 BCCOP       JSR         BCC                     * jump to subroutine that decodes Bcc opcodes
-            JSR         LOOP_CHECK 
+            BRA         LOOP_CHECK 
 
 SHIFTOP     JSR         SHIFT_OPCODES
-            JSR         LOOP_CHECK 
+            BRA         LOOP_CHECK 
 
 
 ERROR:      LEA GENERAL_ERROR, A1                           * general error message
@@ -156,6 +156,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 
