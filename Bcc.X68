@@ -84,6 +84,8 @@ BCC_EIGHT   ADD.W   D6,D1   * calculate displacement and store result in D1
 
 BCC_OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console 
         TRAP    #15
+        LEA     SPACE,A1    * create empty space between opcode
+        TRAP    #15
         MOVE.B  #16,D2  * output displacement in base 16 (hexadecimal)
         MOVE.B  #15,D0  * move trap task into D0
         TRAP    #15     * outputs displacement to console
@@ -118,6 +120,7 @@ BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back 
 
 
     *END    BCC        ; last line of source
+
 
 
 
