@@ -88,9 +88,9 @@ BCC_OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console
         MOVE.B  #15,D0  * move trap task into D0
         TRAP    #15     * outputs displacement to console
         
-        LEA     NEWL,A1 * makes a new line for outputting next opcode
-        MOVE.B  #14,D0  * move trap task to D0
-        TRAP    #15     * output new line
+        *LEA     NEWL,A1 * makes a new line for outputting next opcode
+        *MOVE.B  #14,D0  * move trap task to D0
+        *TRAP    #15     * output new line
         BRA     BCC_END             * end subroutine once displacement is calculated
         
 BCC_SIXTEEN ADDI.L  #$2,D5  
@@ -118,6 +118,7 @@ BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back 
 
 
     *END    BCC        ; last line of source
+
 
 
 

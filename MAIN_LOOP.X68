@@ -73,8 +73,9 @@ MAIN_LOOPS  MOVE.L      A5,D5
             
 NOT_MOVE    *add another opcode here*
 LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
-            BEQ         ERROR
-            ADD.L       D6, A5
+            BNE         NOT_ERROR
+            BSR         ERROR   
+NOT_ERROR   ADD.L       D6, A5
             LEA         NEWLINE,A1                  * Print new line
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
@@ -106,7 +107,7 @@ SHIFTOP     JSR         SHIFT_OPCODES
 ERROR:      LEA GENERAL_ERROR, A1                           * general error message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
-            MOVE.B      #6,D0
+            MOVE.B      #2, D6
             RTS
 
             
@@ -156,6 +157,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

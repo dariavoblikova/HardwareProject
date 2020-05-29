@@ -20,7 +20,8 @@ OddAddrErr                      DC.B    'Provided addresses have to be even. Try
 
 ; common
 NEWL                            DC.B    '',CR,LF,0
-GENERAL_ERROR                   DC.B    'Dissassembler encountered an error',CR,LF,0    *used for general errors
+GENERAL_ERROR                   DC.B    'Dissassembler encountered an error',0    *used for general errors
+
 
 
 
