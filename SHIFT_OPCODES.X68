@@ -139,7 +139,7 @@ SREAD_WORD    LEA SIZEW,A2
 SREAD_LONG    LEA SIZEL,A2
         BRA IR 
         
-SHIFT_EA      MOVE.B  D4,D3
+SHIFT_EA    MOVE.B  D4,D3
         ANDI.B  #$38,D3 * only show EA mode bits
         CMP.B   #$10,D3
         BEQ     SHIFT_IND   * EA is address register indirect
@@ -210,8 +210,11 @@ PRINTABS MOVE.B #14,D0
 
 PRINTIND MOVE.B #14,D0
         TRAP    #15
-        LEA     SPACE,A1    * create empty space between opcode and operand
-        TRAP    #15
+        LEA SIZEW,A4  * load '.W    ' because memory shifts can only be word-sized
+        MOVEA.L A4,A1       load '.W    ' for printing
+        TRAP    #15         print string at (A1)  
+        *LEA     SPACE,A1    * create empty space between opcode and operand
+        *TRAP    #15
         MOVEA.L   A2,A1
         TRAP    #15
         MOVE.B  #3,D0
@@ -291,6 +294,8 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
+
 
 
 
