@@ -120,8 +120,12 @@ REG_MEM_FIRST_REG MOVE.W  #$0001,D4
 REG_MEM_SUB_DATAVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         SUB.W   D2,D3 
         BRA     REG_MEM_DATA_RANGE       
         
@@ -185,8 +189,12 @@ REG_MEM_FIRSTA_REG MOVE.W  #$0001,D4
 REG_MEM_SUB_ADDRVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+
         SUB.W   D2,D3 
         BRA     REG_MEM_ADDR_RANGE  
         
@@ -317,8 +325,12 @@ REG_MEM_FIRST_AREG MOVE.W  #$0001,D4
 REG_MEM_SUB_AVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         SUB.W   D2,D3 
         BRA     REG_MEM_A_RANGE
       
@@ -382,12 +394,19 @@ REG_MEM_FIRSTD_REG MOVE.W  #$0001,D4
 REG_MEM_SUB_DVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         SUB.W   D2,D3 
         BRA     REG_MEM_D_RANGE  
         
-REG_MEM_PRINT   MOVEA.L   A2,A1
+REG_MEM_PRINT   
+        LEA COMMA, A1
+        BSR PRINT
+        MOVEA.L   A2,A1
         MOVE.B  #14,D0
         TRAP    #15
         CMP.B   #$8,D6
@@ -395,8 +414,12 @@ REG_MEM_PRINT   MOVEA.L   A2,A1
         CMP.B   #$9,D6
         BEQ     REG_MEM_LONG_END
         MOVE.B  D6,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         
 REG_MEM_FINAL   MOVEA.L   A3,A1
         MOVE.B  #14,D0
@@ -405,14 +428,22 @@ REG_MEM_FINAL   MOVEA.L   A3,A1
         BRA     REG_MEM_DONE
 
 REG_MEM_WORD_END    MOVE.W  (A0),D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
+        
+        
         MOVE.W  #$6,D6  * displacement value stored in D6
         BRA     REG_MEM_DONE
  
 REG_MEM_LONG_END    MOVE.L  (A0),D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         MOVE.W  #$8,D6  * displacement value stored in D6
         BRA     REG_MEM_DONE
   
@@ -432,9 +463,11 @@ ADDR_REG    DC.B    'A'          ,0
 INDIRECT    DC.B    ',-(A'       ,0
 ADDRPAREN   DC.B    ',(A'        ,0
 REND_PAREN   DC.B    ')'          ,0
-HEX_SYMB    DC.B    ',$'         ,0
+HEX_SYMB    DC.B    '$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
+
+
 
 
 

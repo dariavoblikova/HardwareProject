@@ -289,7 +289,41 @@ PRGL    CMP.B #$00, D1      *if it's reached zero break
 PPRGL   MOVEM (SP)+, D0-D1  *post loop, restore D0 and D1
         RTS
 
-
+*prints D0 without any extra zeros
+*if trying to print one hex digit, use PRINTHEX instead.
+ADAPTIVE_PRINTREG:
+            CMP.L #$00000000, D0    *zero breaks logic so use printreg
+            BNE AD_PR_ST            *if not do ADAPTIVE_PRINTREG logic
+            BSR PRINTREG            *if it's zero then actually printreg
+            RTS
+            
+AD_PR_ST    MOVEM.L D0-D2, -(SP)  *store D0 and D1
+            MOVE.L D0, D2
+            MOVE.L #$00000000, D1
+            
+CHK_ZEROS   ADDI.L #$01, D1         *count valid digits
+            LSR.L #4, D2
+            CMP.L #$00000000, D2
+            BEQ PRE_LOOP
+            BRA CHK_ZEROS
+            
+PRE_LOOP    ROR.L D1, D0        *by this point D1 should contain the number of digits to print. must make it to where loop logic works by rolling digits to back
+            ROR.L D1, D0 
+            ROR.L D1, D0 
+            ROR.L D1, D0        *for each hex digit (4 times)
+            
+            * 000DEFGH      The rotate rights make this
+            * DEFGH000      this
+            * EFGH000D
+            
+PRGL2       CMP.B #$00, D1      *if it's reached zero break
+            BEQ PPRGL2           
+            SUBI.B #$01, D1     *else subtract 1
+            ROL.L #4, D0        *print digits 1-8
+            BSR PRINTHEX        *print hex in D0
+            BRA PRGL2           *loop
+PPRGL2      MOVEM.L (SP)+, D0-D2  *post loop, restore D0 and D1
+            RTS
 
     
 
@@ -432,6 +466,7 @@ PHTF    LEA     HEXF,   A1
 
 PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
+
 
 
 

@@ -206,7 +206,7 @@ PRINTABS MOVE.B #14,D0
         TRAP    #15
         MOVE.B  #3,D0
         TRAP    #15
-        RTS
+        BRA     SHIFT_END
 
 PRINTIND MOVE.B #14,D0
         TRAP    #15
@@ -294,6 +294,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 

@@ -5,8 +5,7 @@
 * Description:
 *-----------------------------------------------------------
 
-MEM_REG:                  ; first instruction of program
-    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
+MEM_REG:    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 
 * Mask byte of opcode to figure out the size field
     MOVE.B  D4,D3
@@ -71,8 +70,13 @@ MEM_REG_ABS_WORD ADDI.L  #$2,D5
         TRAP    #15
         CMP.W   #$0000,D1
         BEQ     MEM_REG_DISP_ADD
-        MOVE.B  #3,D0
-        TRAP    #15
+        *MOVE.B  #3,D0
+        *TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         MOVEA.W #$0000,A1
         LEA     COMMA_ADD,A1
         MOVE.B  #14,D0
@@ -99,8 +103,13 @@ MEM_REG_ABS_LONG  ADDI.L  #$2,D5
         TRAP    #15
         CMP.L   #$00000000,D1
         BEQ     MEM_REG_DISP_LONG
-        MOVE.B  #3,D0
-        TRAP    #15
+        *MOVE.B  #3,D0
+        *TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         MOVEA.W #$0000,A1
         LEA     COMMA_ADD,A1
         MOVE.B  #14,D0
@@ -147,8 +156,12 @@ MEM_REG_REG_RANGE MOVE.B  D4,D3 * move opcode word to D3
         * print address register (indirect post-increment or regular increment)  
         MOVEA.L   A2,A1   
         TRAP    #15
-        MOVE.B  #3,D0   * print register number
-        TRAP    #15
+        *MOVE.B  #3,D0   * print register number
+        *TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
         
         MOVEA.L   A3,A1
         MOVE.B  #14,D0
@@ -216,8 +229,13 @@ MEM_REG_FIRST_AREG MOVE.W  #$0001,D4
 MEM_REG_SUB_AVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        *MOVE.B  #3,D0
+        *TRAP    #15
+         MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         SUB.W   D2,D3 
         BRA     MEM_REG_A_RANGE
       
@@ -281,8 +299,13 @@ MEM_REG_FIRSTD_REG MOVE.W  #$0001,D4
 MEM_REG_SUB_DVALUE   MOVE.B  #14,D0
         TRAP    #15
         MOVE.W  D7,D1
-        MOVE.B  #3,D0
-        TRAP    #15
+        *MOVE.B  #3,D0
+        *TRAP    #15
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         SUB.W   D2,D3 
         BRA     MEM_REG_D_RANGE
 
@@ -308,6 +331,8 @@ POST_PLUS   DC.B    ')+,'        ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
+
 
 
 
