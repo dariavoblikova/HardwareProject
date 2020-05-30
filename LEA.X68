@@ -4,7 +4,8 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-LEA:                  ; first instruction of program
+LEA:                  
+    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 
 * Put program code here
 LEA_REG MOVE.L  D4,D2
@@ -78,9 +79,10 @@ LEA_PRINT   LEA LEA_CODE,A1
     BRA     LEA_DONE
  
 LEA_INVALID JSR    INVALID
-    RTS
+            BRA LEA_DONE
      
-LEA_DONE    RTS       
+LEA_DONE  MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6    
+        RTS       
 
 
 * Put variables and constants here
