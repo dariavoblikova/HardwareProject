@@ -125,8 +125,10 @@ NOT_PRINT  LEA  NOT_CODE,A1
         TRAP    #15
         MOVEA.L A3,A1   * string containing the EA
         TRAP    #15
-        MOVE.L  #3,D0
-        TRAP    #15     * print register number/ address number
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
         BRA     NOT_DONE
 
 NOT_ADDR_PRINT 
@@ -137,8 +139,10 @@ NOT_ADDR_PRINT
         TRAP    #15
         MOVEA.L A3,A1   * string containing the EA
         TRAP    #15
-        MOVE.L  #3,D0
-        TRAP    #15     * print register number/ address number
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
         MOVEA.L A4,A1
         MOVE.L  #14,D0
         TRAP    #15
