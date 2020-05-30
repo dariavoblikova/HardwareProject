@@ -4,7 +4,8 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-NOT:                  ; first instruction of program
+NOT:                  
+    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6  
 
 * here we check what size the operation is (byte, word, or long) 
 NOT_SIZE    MOVE.L  D4,D3
@@ -143,10 +144,11 @@ NOT_ADDR_PRINT
         TRAP    #15
         BRA     NOT_DONE
 
-INVALID_NOT * BRA   INVALID
-        RTS
+INVALID_NOT JSR INVALID
+            BRA NOT_DONE
         
-NOT_DONE    RTS
+NOT_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
+                RTS
 
 * Put variables and constants here
 NOT_CODE    DC.B    'NOT',0
