@@ -72,8 +72,11 @@ JSR_INDIRECT    MOVE.L  #$2,D6  * store displacement in D6
             MOVE.B  #14,D0
             TRAP    #15
             
-            MOVE.B  #3,D0   * print register number
-            TRAP    #15
+            MOVE.L  D1, -(SP)   *safe replacement for trap 15
+            MOVE.L  D1, D0
+            BSR PRINTHEX
+            MOVE.L  (SP)+, D1
+
             
             LEA     END_PAREN,A1    * print ')' for appropriate assembly syntax
             MOVE.B  #14,D0
@@ -109,8 +112,11 @@ JSR_ABS_PRINT   LEA     JSR_M,A1 * print that this is a JSR opcode
             TRAP    #15
             
             MOVE.L  D3,D1
-            MOVE.B  #3,D0
-            TRAP    #15    
+            
+            MOVE.L  D1, -(SP)   *safe replacement for trap 15
+            MOVE.L  D1, D0
+            BSR ADAPTIVE_PRINTREG
+            MOVE.L  (SP)+, D1       
             
             BRA     JSR_END
            
@@ -131,6 +137,7 @@ HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
     * END    NOP_RTS_JSR        ; last line of source
+
 
 
 

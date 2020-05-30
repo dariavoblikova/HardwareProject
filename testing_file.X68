@@ -18,35 +18,35 @@ NOP
     RTS
     NOP
     RTS
-    MOVEM.W   (A1)+,A1-A7
-    MOVEM.L   (A1)+,D1-D7
-    MOVEM.W   (A1)+,A1/D7
-    MOVEM.L   (A1)+,A1/D7
-    MOVEM.W   (A1),A1-A7
-    MOVEM.L   (A1),D1-D7
-    MOVEM.W   (A1),A1/D7
-    MOVEM.L   (A1),A1/D7
-    ADD.B     D1,D2
-    ADD.B     D1,(A1)
-    ADD.B     D1,(A1)+
-    ADD.B     D1,-(A1)
-    ADD.B     (A1),D1
-    ADD.B     (A1)+,D1
-    ADD.B     -(A1),D1
-    ADD.W     D1,D2
-    ADD.W     D1,(A1)
-    ADD.W     D1,(A1)+
-    ADD.W     D1,-(A1)
-    ADD.W     (A1),D1
-    ADD.W     (A1)+,D1
-    ADD.W     -(A1),D1
-    ADD.L     D1,D2
-    ADD.L     D1,(A1)
-    ADD.L     D1,(A1)+
-    ADD.L     D1,-(A1)
-    ADD.L     (A1),D1
-    ADD.L     (A1)+,D1
-    ADD.L     -(A1),D1
+*    MOVEM.W   (A1)+,A1-A7
+*    MOVEM.L   (A1)+,D1-D7
+*    MOVEM.W   (A1)+,A1/D7
+*    MOVEM.L   (A1)+,A1/D7
+*    MOVEM.W   (A1),A1-A7
+*    MOVEM.L   (A1),D1-D7
+*    MOVEM.W   (A1),A1/D7
+*    MOVEM.L   (A1),A1/D7
+*    ADD.B     D1,D2
+*    ADD.B     D1,(A1)
+*    ADD.B     D1,(A1)+
+*    ADD.B     D1,-(A1)
+*    ADD.B     (A1),D1
+*    ADD.B     (A1)+,D1
+*    ADD.B     -(A1),D1
+*    ADD.W     D1,D2
+*    ADD.W     D1,(A1)
+*    ADD.W     D1,(A1)+
+*    ADD.W     D1,-(A1)
+*    ADD.W     (A1),D1
+*    ADD.W     (A1)+,D1
+*    ADD.W     -(A1),D1
+*    ADD.L     D1,D2
+*    ADD.L     D1,(A1)
+*    ADD.L     D1,(A1)+
+*    ADD.L     D1,-(A1)
+*    ADD.L     (A1),D1
+*    ADD.L     (A1)+,D1
+*    ADD.L     -(A1),D1
     LSL.B     D1,D2
     LSL.W     D1,D2
     LSL.W     (A1)
@@ -86,39 +86,39 @@ label1
     NOP
     RTS
 label3
-    MOVEM.W   A1-A7,$12
-    MOVEM.L   D1-D7,$12
-    MOVEM.W   A1/D7,$12
-    MOVEM.L   A1/D7,$12
-    MOVEM.W   A1-A7,$1234
-    MOVEM.L   D1-D7,$1234
-    MOVEM.W   A1/D7,$1234
-    MOVEM.L   A1/D7,$1234
-    MOVEM.W   A1-A7,$12345678
-    MOVEM.L   D1-D7,$12345678
-    MOVEM.W   A1/D7,$12345678
-    MOVEM.L   A1/D7,$12345678
-    MOVEM.W   $12,A1-A7
-    MOVEM.L   $12,D1-D7
-    MOVEM.W   $12,A1/D7
-    MOVEM.L   $12,A1/D7
-    MOVEM.W   $1234,A1-A7
-    MOVEM.L   $1234,D1-D7
-    MOVEM.W   $1234,A1/D7
-    MOVEM.L   $1234,A1/D7
-    MOVEM.W   $12345678,A1-A7
-    MOVEM.L   $12345678,D1-D7
-    MOVEM.W   $12345678,A1/D7
-    MOVEM.L   $12345678,A1/D7
+*    MOVEM.W   A1-A7,$12
+*    MOVEM.L   D1-D7,$12
+*    MOVEM.W   A1/D7,$12
+*    MOVEM.L   A1/D7,$12
+*    MOVEM.W   A1-A7,$1234
+*    MOVEM.L   D1-D7,$1234
+*    MOVEM.W   A1/D7,$1234
+*    MOVEM.L   A1/D7,$1234
+*    MOVEM.W   A1-A7,$12345678
+*    MOVEM.L   D1-D7,$12345678
+*    MOVEM.W   A1/D7,$12345678
+*    MOVEM.L   A1/D7,$12345678
+*    MOVEM.W   $12,A1-A7
+*    MOVEM.L   $12,D1-D7
+*    MOVEM.W   $12,A1/D7
+*    MOVEM.L   $12,A1/D7
+*    MOVEM.W   $1234,A1-A7
+*    MOVEM.L   $1234,D1-D7
+*    MOVEM.W   $1234,A1/D7
+*    MOVEM.L   $1234,A1/D7
+*    MOVEM.W   $12345678,A1-A7
+*    MOVEM.L   $12345678,D1-D7
+*    MOVEM.W   $12345678,A1/D7
+*    MOVEM.L   $12345678,A1/D7
     LSL.B     #$1,D2
     LSL.W     #$2,D2
     LSL.L     #$3,D2
     LSL.W     $12
     LSL.W     $1234
     LSL.W     $12345678
-    ASR.B     #$1,D2
+    ASR.B     #$1,D1
     ASR.W     #$2,D2
-    ASR.L     #$3,D2
+    ASR.L     #$3,D3
     ASR.W     $12
     ASR.W     $1234
     ASR.W     $12345678
@@ -140,6 +140,8 @@ label4
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 
 

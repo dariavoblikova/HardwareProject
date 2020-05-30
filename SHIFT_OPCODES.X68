@@ -204,8 +204,12 @@ PRINTABS MOVE.B #14,D0
         TRAP    #15
         MOVEA.L   A2,A1
         TRAP    #15
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         BRA     SHIFT_END
 
 PRINTIND MOVE.B #14,D0
@@ -217,8 +221,12 @@ PRINTIND MOVE.B #14,D0
         *TRAP    #15
         MOVEA.L   A2,A1
         TRAP    #15
-        MOVE.B  #3,D0
-        TRAP    #15
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR ADAPTIVE_PRINTREG
+        MOVE.L  (SP)+, D1
+        
         MOVEA.L   A3,A1
         MOVE.B  #14,D0
         TRAP    #15
@@ -258,8 +266,12 @@ SHIFT_PRINT   MOVE.B  #14,D0
         TRAP    #15     * display size of opcode
         MOVEA.L   A3,A1   * move string representing count/reg to A1
         TRAP    #15     * display '#' or 'D'
-        MOVE.B  #3,D0
-        TRAP    #15     * display count/register number
+        
+        MOVE.L  D1, -(SP)   *safe replacement for trap 15
+        MOVE.L  D1, D0
+        BSR PRINTHEX
+        MOVE.L  (SP)+, D1
+        
         LEA     COMMA,A1
         MOVE.B  #14,D0
         TRAP    #15     * display comma seperating operands
@@ -294,6 +306,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 
