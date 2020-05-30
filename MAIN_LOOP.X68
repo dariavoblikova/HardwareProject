@@ -164,37 +164,22 @@ PRINT_CURR_ADDR
             TRAP        #15                         * Trap 15, print current address
             MOVEM.L     (SP)+, D0-D7/A0-A6          * Pop the registers back
             RTS
-            
+
 CLEAR_REGISTERS                                     * Clear all registers except for starting (A5) and ending(A6) address
             CLR.L   D0
-            CLR.L   D5
-            CLR.L   D2
             CLR.L   D1
+            CLR.L   D2
             CLR.L   D3
             CLR.L   D4
+            CLR.L   D5
             CLR.L   D6
+            CLR.L   D7
+            MOVE.L  #$00000000,A0
             MOVE.L  #$00000000,A1
             MOVE.L  #$00000000,A2
             MOVE.L  #$00000000,A3
             MOVE.L  #$00000000,A4
             RTS
-
-INPUT_ENTER     LEA     PRESS_ENTER_PROMPT, A1      
-                MOVE.B  #14,D0                      * Task 14 of trap 15
-                TRAP    #15
-                MOVE.B  #00,LINECOUNTER             * Clear the line counter
-                MOVE.B  #5,D0                       * Task 5 of trap 15 (Read single character from the keyboard into D1.B. )
-                TRAP    #15                         * Trap 15
-                CMP.B   #$0D, D1                    * D1.B Contains user input, ENTER = D000D
-                BEQ     CLEAR_SCREEN                * If user pressed clear the screen (need it to print next set of instructions from memory)
-                BNE     INPUT_ENTER                 * Loop back until press an enter
-
-CLEAR_SCREEN    MOVE.B  #11,D0                      * Task 11 of trap 15
-                MOVE.W  #$FF00,D1                   * To clear Screen set D1.W to $FF00
-                TRAP #15                            * I/O. Trap 15 task 11
-                CLR     D0                          * Clear registers used
-                CLR     D1                          * Clear registers used
-                RTS
 
 EXIT_MAIN_LOOP  MOVEM.L     (SP)+, D0-D7/A0-A6      * pop the registers back
                 RTS
@@ -208,6 +193,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 

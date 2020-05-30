@@ -17,11 +17,7 @@ MAIN    ORG    $1000
     TRAP        #15                         Task 15, print new line
 
     JSR         MAIN_LOOP                   Located in MAIN_LOOP.X68 file
-    *JSR         ASK_TO_REPEAT               NOT IMPLEMENTED YET(should be in I_O_SUBROUTINE)
-    *CMP ...                                 COMPARE ANSWER TO 1 (1 = yes)
-    *BEQ         MAIN
-    JSR         FINISH_MESSAGE
-    JMP         STOP
+    JSR         INPUT_QUIT_RESTART          Located in I_O_SUBROUTINE
     
 *-----------------------------------------------------------
     * The order of includes is important!!
@@ -41,13 +37,14 @@ MAIN    ORG    $1000
     INCLUDE 'NOT.x68'
     INCLUDE 'LEA.x68'
     INCLUDE 'MOVEQ.x68'
-    * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
     
     
 LINECOUNTER      DS.B    1
 
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
+
 
 
 
