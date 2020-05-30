@@ -21,7 +21,7 @@ IO                  ; first instruction of program
 
 *TODO: Validate addresses are within appropriate range?
 GET_ADDRESS_IO
-                    MOVEM.L     D0-D7/A0-A4, -(SP)       * Enter subroutine. Saving all the registers(except D5 and D6) to the stack
+                    MOVEM.L     D0-D7/A0-A4, -(SP)       * Enter subroutine. Saving all the registers(except A5 and A6) to the stack
 GET_START_ADDR:        
                     CLR.L       D5                          * Clear D5 register that we'll use for starting address output
                     LEA         InpStartAddrMess,A1         * Loads string into A1
@@ -126,7 +126,10 @@ NOT_EVEN_ADDRESS    LEA         NEWL,A1
                     MOVE.B      #14,D0                      * Stores task 14 in D0
                     TRAP        #15                         * Perform trap 15 task 14, reading string from A1
                     BRA         GET_START_ADDR              * One of the addresses is odd. Start over
-SUCCESS_ADDR_INPUT
+SUCCESS_ADDR_INPUT  LEA         NEWL,A1                     * Loads new line string into A1
+                    MOVE.B      #14,D0                      * Stores task 14 in D0
+                    TRAP        #15                         * Perform trap 15 task 14, reading string from A1
+                    JSR         INPUT_ENTER
                     MOVEM.L     (SP)+, D0-D7/A0-A4          * Returning from subroutine(need to pop saved registers). Returning starting addr in A5 and ending in A6
                     RTS                                     * Return to main routine
 
@@ -137,6 +140,8 @@ SUCCESS_ADDR_INPUT
 * NEWL    DC.B    '',CR,LF,0
 
      * END         IO   ; last line of source
+
+
 
 
 

@@ -9,6 +9,7 @@ stack EQU $00100000
     
 MAIN    ORG    $1000
     LEA         stack,SP                    Set location of the stack pointer
+    MOVE.B      #$00, LINECOUNTER           Set line counter to 0
     JSR         GET_ADDRESS_IO              Located in USERINPUT.X68, Loads start address to A5 and end address to A6
     
     LEA         NEWLINE,A1                  Print new line
@@ -41,8 +42,15 @@ MAIN    ORG    $1000
     INCLUDE 'LEA.x68'
     INCLUDE 'MOVEQ.x68'
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
+    
+    
+LINECOUNTER      DS.B    1
+
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
+
+
 
 
 

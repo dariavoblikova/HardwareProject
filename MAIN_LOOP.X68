@@ -1,6 +1,6 @@
 *-----------------------------------------------------------
 * Title      : Main Subroutine (decoding opcodes loop)
-* Written by : Daria Voblikova
+* Written by : Daria Voblikova, Alexander Dietrich, Amman Zenebe Nega
 * Date       : 5/25/2020
 * Description: Gets starting address from A5 and ending address from A6, parses memory and opcodes
 * A5 first hold starting address and then serves as a current address
@@ -14,7 +14,11 @@ MAIN_LOOP   MOVEM.L     D0-D7/A0-A6, -(SP)          * save all registers
 MAIN_LOOPS  MOVE.L      A5,D5
             CMPA.L      A5,A6                       * A6-A5 (MAIN_LOOPS for MAIN_LOOP start, fixes stack issue with saving each loop)
             BLE         EXIT_MAIN_LOOP              * IF A6<=A5, we are done
-            JSR         PRINT_CURR_ADDR             * Print current memory location to the console
+            
+            CMP.B       #30,LINECOUNTER             * Screen is 32-lines long, check if line counter is almost full, one line need to print prompt plus one more to be save if we print new line
+            BNE         CONTINUE_MAIN_LOOPS         * If line counter is not maxed out yet, move on
+            JSR         INPUT_ENTER                 * Screen is full, prompt user to press enter
+CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory location to the console
             MOVE.W      (A5),D4                     * Load opcode word to D4, subroutines use it
             
             LEA         TAB,A1                      * Print tab
@@ -22,10 +26,10 @@ MAIN_LOOPS  MOVE.L      A5,D5
             TRAP        #15                         * Task 15, print tab
             
             * check if NOP/JSR/RTS opcode
-            MOVE.W      D4,D3                   * use D3 for masking so we don't lose opcode in D4
-            ANDI.W      #$FF00,D3               * mask word to look at leftmost byte
-            CMP.W       #$4E00,D3               * check if word could be a NOP, JSR, or RTS opcode
-            BEQ         FOUREOP                 * branch to call subroutine that decodes this opcode
+            MOVE.W      D4,D3                       * use D3 for masking so we don't lose opcode in D4
+            ANDI.W      #$FF00,D3                   * mask word to look at leftmost byte
+            CMP.W       #$4E00,D3                   * check if word could be a NOP, JSR, or RTS opcode
+            BEQ         FOUREOP                     * branch to call subroutine that decodes this opcode
                        
             * check for type of MOVEM
             CMP.W       #$4800,D3
@@ -50,8 +54,8 @@ MAIN_LOOPS  MOVE.L      A5,D5
             CMP.W   #$D000, D3
             BEQ ADDOP
             *check if SUB opcode
-            CMP.W   #$9000, D3  *almost over 9000
-            BEQ ADDOP           *SUB included in ADD as they're the same other than first hex digit
+            CMP.W   #$9000, D3                      *almost over 9000
+            BEQ ADDOP                               *SUB included in ADD as they're the same other than first hex digit
             *check if AND opcode
             CMP.W   #$C000, D3
             BEQ ADDOP
@@ -91,13 +95,16 @@ MAIN_LOOPS  MOVE.L      A5,D5
             
             
 NOT_MOVE    *add another opcode here*
-LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
+LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode was invalid
             BNE         NOT_ERROR
             BSR         ERROR   
-NOT_ERROR   ADD.L       D6, A5
+NOT_ERROR   ADD.L       D6, A5                      * Increment current address by displacement
+            
             LEA         NEWLINE,A1                  * Print new line
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
+            
+            ADD.B       #01,LINECOUNTER             * Increment line counter
             BRA MAIN_LOOPS
 
 
@@ -116,25 +123,26 @@ ADDOP       JSR ADD_SUBROUTINE
 MOVEOP      JSR MOVE_SUBROUTINE
             BRA  LOOP_CHECK       
         
-FOUREOP     JSR         NOP_RTS_JSR             * subroutine to decode one of three opcodes
+FOUREOP     JSR         NOP_RTS_JSR                 * subroutine to decode one of three opcodes
             BRA         LOOP_CHECK        
             
-REGMEMOP    JSR         REG_MEM             * subroutine to decode one of three opcodes
+REGMEMOP    JSR         REG_MEM                     * subroutine to decode one of three opcodes
             BRA         LOOP_CHECK         
 
-MEMREGOP    JSR         MEM_REG             * subroutine to decode one of three opcodes
+MEMREGOP    JSR         MEM_REG                     * subroutine to decode one of three opcodes
             BRA         LOOP_CHECK         
            
-BCCOP       JSR         BCC                     * jump to subroutine that decodes Bcc opcodes
+BCCOP       JSR         BCC                         * jump to subroutine that decodes Bcc opcodes
             BRA         LOOP_CHECK 
 
 SHIFTOP     JSR         SHIFT_OPCODES
             BRA         LOOP_CHECK 
 
 
-ERROR:      LEA GENERAL_ERROR, A1                           * general error message
+ERROR:      LEA         GENERAL_ERROR, A1           * general error message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
+            ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
             MOVE.B      #2, D6
             RTS
 
@@ -171,20 +179,39 @@ CLEAR_REGISTERS                                     * Clear all registers except
             MOVE.L  #$00000000,A4
             RTS
 
+INPUT_ENTER     LEA     PRESS_ENTER_PROMPT, A1      
+                MOVE.B  #14,D0                      * Task 14 of trap 15
+                TRAP    #15
+                MOVE.B  #00,LINECOUNTER             * Clear the line counter
+                MOVE.B  #5,D0                       * Task 5 of trap 15 (Read single character from the keyboard into D1.B. )
+                TRAP    #15                         * Trap 15
+                CMP.B   #$0D, D1                    * D1.B Contains user input, ENTER = D000D
+                BEQ     CLEAR_SCREEN                * If user pressed clear the screen (need it to print next set of instructions from memory)
+                BNE     INPUT_ENTER                 * Loop back until press an enter
+
+CLEAR_SCREEN    MOVE.B  #11,D0                      * Task 11 of trap 15
+                MOVE.W  #$FF00,D1                   * To clear Screen set D1.W to $FF00
+                TRAP #15                            * I/O. Trap 15 task 11
+                CLR     D0                          * Clear registers used
+                CLR     D1                          * Clear registers used
+                RTS
+
 EXIT_MAIN_LOOP  MOVEM.L     (SP)+, D0-D7/A0-A6      * pop the registers back
                 RTS
           
 NEWLINE       DC.B    '',CR,LF,0
 TAB           DC.B    '    ',0
     
-    
 
-        * INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
 
  * SIMHALT                                 ; halt simulator
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
+
+
 
 
 
