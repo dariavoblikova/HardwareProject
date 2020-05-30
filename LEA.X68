@@ -77,12 +77,11 @@ LEA_PRINT   LEA LEA_CODE,A1
     TRAP    #15
     BRA     LEA_DONE
  
-LEA_INVALID *JSR    INVALID
+LEA_INVALID JSR    INVALID
     RTS
      
 LEA_DONE    RTS       
 
-    * SIMHALT             ; halt simulator
 
 * Put variables and constants here
 LEA_CODE    DC.B    'LEA    ',0
@@ -93,7 +92,6 @@ LEA_COMMA       DC.B    ',',0
 LEA_ADDR        DC.B    'A',0
 
 
-    * END    LEA        ; last line of source
 
 
 *~Font name~Courier New~
