@@ -14,9 +14,14 @@ start		EQU	$00009000	* ORG and END address
 
 		ORG	start
 
-    NOT.L D3
-    NOT.W (A0)
-    NOT.B D2
+    MOVEA.L D4,         A0
+    MOVEA.W $00004000,  A1
+    MOVEA.L #$A0A0A0A0, A2
+    MOVEA.W (A3),       A3
+    MOVEA.L (A0)+,      A4
+    MOVEA.L -(A6),      A5
+    
+    
 
 * Put program code here
 
@@ -25,6 +30,7 @@ start		EQU	$00009000	* ORG and END address
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 

@@ -68,7 +68,7 @@ LEA_PRINT   LEA LEA_CODE,A1
     MOVE.L  D3,D1
     MOVE.L  D1, -(SP)   *safe replacement for trap 15
     MOVE.L  D1, D0
-    BSR PRINTHEX
+    BSR ADAPTIVE_PRINTREG
     MOVE.L  (SP)+, D1
     MOVEA.L A3,A1
     MOVE.L  #14,D0
@@ -78,7 +78,7 @@ LEA_PRINT   LEA LEA_CODE,A1
     MOVE.L  D2,D1
     MOVE.L  D1, -(SP)   *safe replacement for trap 15
     MOVE.L  D1, D0
-    BSR ADAPTIVE_PRINTREG
+    BSR PRINTHEX
     MOVE.L  (SP)+, D1
     BRA     LEA_DONE
  
@@ -96,6 +96,7 @@ LEA_ENDPAREN    DC.B    '),',0
 LEA_HEXSYMB     DC.B    '$',0
 LEA_COMMA       DC.B    ',',0
 LEA_ADDR        DC.B    'A',0
+
 
 
 

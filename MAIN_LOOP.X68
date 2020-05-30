@@ -107,7 +107,7 @@ NOTOP       JSR NOT
 LEAOP       JSR LEA
             BRA LOOP_CHECK
            
-MOVEQ       JSR MOVEQ
+MOVEQOP     JSR MOVEQ
             BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
@@ -185,6 +185,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 

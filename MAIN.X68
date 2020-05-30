@@ -38,9 +38,12 @@ MAIN    ORG    $1000
     INCLUDE 'ADD_SUBROUTINE.x68'
     INCLUDE 'MOVE_SUBROUTINE.x68'
     INCLUDE 'NOT.x68'
+    INCLUDE 'LEA.x68'
+    INCLUDE 'MOVEQ.x68'
     * INCLUDE 'REG_MEM.X68'                 MOVEM Decoding for Register to Memory
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
 
 
 
