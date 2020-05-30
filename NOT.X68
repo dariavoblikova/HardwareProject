@@ -4,7 +4,6 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-    ORG    $1000
 NOT:                  ; first instruction of program
 
 * here we check what size the operation is (byte, word, or long) 
@@ -148,7 +147,6 @@ INVALID_NOT * BRA   INVALID
         RTS
         
 NOT_DONE    RTS
-    SIMHALT             ; halt simulator
 
 * Put variables and constants here
 NOT_CODE    DC.B    'NOT',0
@@ -162,7 +160,7 @@ NOT_PREPAREN    DC.B    '-(A',0
 NOT_POSTPAREN   DC.B    ')+',0
 NOT_HEXSYMB     DC.B    '$',0
 
-    END    NOT       ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~

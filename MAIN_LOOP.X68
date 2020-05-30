@@ -62,6 +62,12 @@ MAIN_LOOPS  MOVE.L      A5,D5
             CMP.W   #$5000, D3
             BEQ ADDOP
             
+            *check if NOT opcode
+            MOVE.W  D4, D3
+            AND.W   #$FF00, D3
+            CMP.W   #$4600, D3
+            BEQ NOTOP
+            
             *check if MOVE opcode
             MOVE.W D4, D3
             AND.W   #$F000, D3
@@ -81,6 +87,9 @@ NOT_ERROR   ADD.L       D6, A5
             TRAP        #15                         * Task 15, print new line
             BRA MAIN_LOOPS
 
+
+NOTOP       JSR NOT
+            BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
             BRA LOOP_CHECK
@@ -157,6 +166,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 
