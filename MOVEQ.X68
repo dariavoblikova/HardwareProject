@@ -32,16 +32,20 @@ MOVEQ_DATA  MOVE.L  D4,D3
     TRAP    #15
     LEA     MOVEQ_POUND,A1
     TRAP    #15
-    MOVE.L  #3,D0
-    TRAP    #15
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR ADAPTIVE_PRINTREG
+    MOVE.L  (SP)+, D1
     LEA     MOVEQ_COMMA,A1
     MOVE.L  #14,D0
     TRAP    #15
     LEA     MOVEQ_DREG,A1
     TRAP    #15
     MOVE.L  D2,D1
-    MOVE.L  #3,D0
-    TRAP    #15    
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR PRINTHEX
+    MOVE.L  (SP)+, D1   
     BRA     MOVEQ_DONE
     
 * opcode is only invalid if bit 8 in the instruction format isn't a 0  
