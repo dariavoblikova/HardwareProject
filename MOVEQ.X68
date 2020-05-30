@@ -6,8 +6,8 @@
 *-----------------------------------------------------------
 
 * we come into this subroutine assuming that the leftmost nibble is a 7.
-MOVEQ:                  ; first instruction of program
-
+MOVEQ:                  
+    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
 * First mask all but the 8th bit from the left, to see if it is set to 0
     MOVE.L  D4,D3
     ANDI.L  #$0100,D3
@@ -42,10 +42,14 @@ MOVEQ_DATA  MOVE.L  D4,D3
     MOVE.L  D2,D1
     MOVE.L  #3,D0
     TRAP    #15    
-  
+    BRA     MOVEQ_DONE
+    
 * opcode is only invalid if bit 8 in the instruction format isn't a 0  
-INVALID_MOVEQ * JSR   INVALID
-        RTS
+INVALID_MOVEQ  JSR   INVALID
+        BRA     MOVEQ_DONE
+        
+MOVEQ_DONE  MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
+            RTS     *Return to subroutine here
   
     *SIMHALT             ; halt simulator
 
