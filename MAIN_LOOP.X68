@@ -68,6 +68,18 @@ MAIN_LOOPS  MOVE.L      A5,D5
             CMP.W   #$4600, D3
             BEQ NOTOP
             
+            * check if LEA opcode
+            MOVE.W  D4,D3
+            AND.W   #$F000,D3
+            CMP.W   #$4000,D3
+            BEQ     LEA
+            
+            * check if MOVEQ opcode
+            MOVE.W  D4,D3
+            AND.W   #$F000,D3
+            CMP.W   #$7000,D3
+            BEQ     MOVEQ
+            
             *check if MOVE opcode
             MOVE.W D4, D3
             AND.W   #$F000, D3
@@ -76,6 +88,7 @@ MAIN_LOOPS  MOVE.L      A5,D5
             CMP.W   #$3000, D3
             BGT NOT_MOVE        *if >3 not ADD
             BRA MOVEOP
+            
             
 NOT_MOVE    *add another opcode here*
 LOOP_CHECK  CMP.W       #$1,D6                  * our check to see if opcode was invalid
