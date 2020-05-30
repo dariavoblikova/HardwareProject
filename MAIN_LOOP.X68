@@ -72,13 +72,13 @@ MAIN_LOOPS  MOVE.L      A5,D5
             MOVE.W  D4,D3
             AND.W   #$F000,D3
             CMP.W   #$4000,D3
-            BEQ     LEA
+            BEQ     LEAOP
             
             * check if MOVEQ opcode
             MOVE.W  D4,D3
             AND.W   #$F000,D3
             CMP.W   #$7000,D3
-            BEQ     MOVEQ
+            BEQ     MOVEQOP
             
             *check if MOVE opcode
             MOVE.W D4, D3
@@ -102,6 +102,12 @@ NOT_ERROR   ADD.L       D6, A5
 
 
 NOTOP       JSR NOT
+            BRA LOOP_CHECK
+            
+LEAOP       JSR LEA
+            BRA LOOP_CHECK
+           
+MOVEQ       JSR MOVEQ
             BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
