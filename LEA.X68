@@ -66,16 +66,20 @@ LEA_PRINT   LEA LEA_CODE,A1
     MOVEA.L A2,A1
     TRAP    #15
     MOVE.L  D3,D1
-    MOVE.L  #3,D0
-    TRAP    #15
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR PRINTHEX
+    MOVE.L  (SP)+, D1
     MOVEA.L A3,A1
     MOVE.L  #14,D0
     TRAP    #15
     LEA     LEA_ADDR,A1
     TRAP    #15
     MOVE.L  D2,D1
-    MOVE.L  #3,D0
-    TRAP    #15
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR ADAPTIVE_PRINTREG
+    MOVE.L  (SP)+, D1
     BRA     LEA_DONE
  
 LEA_INVALID JSR    INVALID
