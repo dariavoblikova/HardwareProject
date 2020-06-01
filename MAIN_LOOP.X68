@@ -91,7 +91,7 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             BEQ NOT_MOVE        *if =0 not ADD
             CMP.W   #$3000, D3
             BGT NOT_MOVE        *if >3 not ADD
-            BRA MOVEOP
+            BEQ MOVEOP
             
             
 NOT_MOVE    *add another opcode here*
