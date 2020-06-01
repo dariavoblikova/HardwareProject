@@ -212,7 +212,7 @@ REG_MEM_IND_ADDR MOVE.B  D4,D3
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         CLR     D4
-        LEA     ADDRPAREN,A2
+        LEA     ADDRPAREN_COMMA,A2
         LEA     REND_PAREN,A3
         BRA     REG_MEM_A_RANGE
 
@@ -461,11 +461,15 @@ DATA_REG    DC.B    'D'          ,0
 ADDR_SLASH  DC.B    '/A'         ,0
 ADDR_REG    DC.B    'A'          ,0
 INDIRECT    DC.B    ',-(A'       ,0
-ADDRPAREN   DC.B    ',(A'        ,0
+ADDRPAREN   DC.B    '(A'        ,0
+ADDRPAREN_COMMA DC.B    ',(A'    ,0
 REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    '$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
+
+
+
 
 
 

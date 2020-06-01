@@ -28,7 +28,7 @@ MEM_REG_LONG    LEA LONG_LEN,A1
 MEM_REG_EA_MODE MOVE.B  D4,D3
         AND.B   #$38,D3
         CMP.B   #$18,D3
-        BEQ     MEM_REG_POST_INC * we know it's a predecrement mode if equal
+        BEQ     MEM_REG_POST_INC * we know it's a posincrement mode if equal
         CMP.B   #$10,D3
         BEQ     MEM_REG_IND_ADDR
         
@@ -49,7 +49,7 @@ MEM_REG_POST_INC    LEA ADDRPAREN,A2
   
 * branch here to grab strings displaying '(AX)'      
 MEM_REG_IND_ADDR    LEA ADDRPAREN,A2
-        LEA     END_PAREN,A3
+        LEA     END_PAREN_COMMA,A3
         BRA     MEM_REG_REG_RANGE
         
 MEM_REG_ABS_WORD ADDI.L  #$2,D5
@@ -318,19 +318,21 @@ MEM_REG_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers b
     * SIMHALT             ; halt simulator
 
 * Put variables and constants here
-COMMA_ADD   DC.B    ','          ,0
+COMMA_ADD   DC.B    ','           ,0
 *WORD_LEN    DC.B    'MOVEM.W    ',0
 *LONG_LEN    DC.B    'MOVEM.L    ',0
 *DATA_SLASH  DC.B    '/D'         ,0
 *DATA_REG    DC.B    'D'          ,0
 *ADDR_SLASH  DC.B    '/A'         ,0
 *ADDR_REG    DC.B    'A'          ,0
-POST_PLUS   DC.B    ')+,'        ,0
+POST_PLUS   DC.B    ')+,'         ,0
+END_PAREN_COMMA DC.B    '),'      ,0
 *ADDRPAREN   DC.B    '(A'         ,0
 *END_PAREN   DC.B    '),'         ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
 
 
 
