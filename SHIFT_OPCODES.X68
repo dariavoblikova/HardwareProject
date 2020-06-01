@@ -200,8 +200,11 @@ SHIFT_LONG  LEA HEXSYMB,A2  * load string with '$' symbol in A2
         
 PRINTABS MOVE.B #14,D0
         TRAP    #15
-        LEA     SPACE,A1    * create empty space between opcode and operand
-        TRAP    #15
+        LEA SIZEW,A4  * load '.W    ' because memory shifts can only be word-sized
+        MOVEA.L A4,A1       load '.W    ' for printing
+        TRAP    #15         print string at (A1) 
+        *LEA     SPACE,A1    * create empty space between opcode and operand
+        *TRAP    #15
         MOVEA.L   A2,A1
         TRAP    #15
         
@@ -306,6 +309,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 
