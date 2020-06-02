@@ -37,12 +37,14 @@ MAIN    ORG    $1000
     INCLUDE 'NOT.x68'
     INCLUDE 'LEA.x68'
     INCLUDE 'MOVEQ.x68'
+    INCLUDE 'INVALIDEA.X68'
     
     
 LINECOUNTER      DS.B    1
 
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
 
 
 
