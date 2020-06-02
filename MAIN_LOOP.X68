@@ -91,7 +91,7 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             BEQ NOT_MOVE        *if =0 not ADD
             CMP.W   #$3000, D3
             BGT NOT_MOVE        *if >3 not ADD
-            BEQ MOVEOP
+            BRA MOVEOP
             
             
 NOT_MOVE    *add another opcode here*
@@ -139,14 +139,20 @@ SHIFTOP     JSR         SHIFT_OPCODES
             BRA         LOOP_CHECK 
 
 
+* opcode error message can go in place of ERROR label (ex. XXXXXXXX DATA YYYY)
 ERROR:      LEA         GENERAL_ERROR, A1           * general error message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
             ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
             MOVE.B      #2, D6
-            RTS
+            RTS         NOT_ERROR
 
-            
+EA_ERROR    LEA         EAERROR_MESSAGE,A1          * invalid EA error message
+            MOVE.B      #14,D0                      * Stores task 14 in D0
+            TRAP        #15                         * Task 15, print new line
+            ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
+            MOVE.B      #2, D6
+            BRA         NOT_ERROR           
 
 
 * this can be the format for the rest of the file, HEXGROUP continuously masks word and sees if 
@@ -193,6 +199,9 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
+
 
 
 

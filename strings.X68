@@ -21,8 +21,10 @@ OddAddrErr                      DC.B    'Provided addresses have to be even. Try
 ; common
 NEWL                            DC.B    '',CR,LF,0
 GENERAL_ERROR                   DC.B    'Dissassembler encountered an error',0    *used for general errors
+EAERROR_MESSAGE                 DC.B    'Invalid EA.',0 *used for invalid effective addresses
 PRESS_ENTER_PROMPT              DC.B    'Press ENTER key to continue', CR,LF,0
 QUIT_RESTART_PROMPT             DC.B    'Press q to quit, r to restart', CR,LF,0
+
 
 
 

@@ -39,7 +39,7 @@ REG_MEM_EA_MODE MOVE.B  D4,D3
         CMP.B   #$39,D3
         BEQ     REG_MEM_ABS_LONG  
         
-        BRA     REG_MEM_INVALID
+        BRA     REG_MEM_INVALIDEA
     
 REG_MEM_PRE_DEC MOVE.B  D4,D3
         AND.B   #$07,D3 * obtain address register number
@@ -230,8 +230,8 @@ REG_MEM_ABS_WORD ADDI.L  #$2,D5
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
-        CMP.W   #$0000,D4
-        BEQ     REG_MEM_DISP_ADD
+        *CMP.W   #$0000,D4
+        *BEQ     REG_MEM_DISP_ADD
         MOVE.B  #$8,D6
         CLR     D4
         BRA     REG_MEM_A_RANGE
@@ -250,20 +250,11 @@ REG_MEM_ABS_LONG  ADDI.L  #$2,D5
         MOVE.B  #14,D0 * starting print MOVEM opcode
         TRAP    #15   
         LEA     HEX_SYMB,A2
-        CMP.L   #$00000000,D4
-        BEQ     REG_MEM_DISP_LONG
+        *CMP.L   #$00000000,D4
+        *BEQ     REG_MEM_DISP_LONG
         MOVE.B  #$9,D6
         CLR     D4
-        BRA     REG_MEM_A_RANGE
-  
-        
-REG_MEM_DISP_ADD    LEA ZERO_ADD,A3
-        CLR     D4
-        BRA     REG_MEM_A_RANGE
-
-REG_MEM_DISP_LONG   LEA LONG_ADD,A3
-        CLR     D4
-        BRA     REG_MEM_A_RANGE     
+        BRA     REG_MEM_A_RANGE      
 
 REG_MEM_A_RANGE CMP.L    #$0100,D3
         BLT REG_MEM_D_RANGE
@@ -449,6 +440,9 @@ REG_MEM_LONG_END    MOVE.L  (A0),D1
   
 REG_MEM_INVALID JSR   INVALID
             BRA     REG_MEM_DONE
+            
+REG_MEM_INVALIDEA   JSR INVALIDEA
+            BRA     REG_MEM_DONE
         
 REG_MEM_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
@@ -467,6 +461,8 @@ REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    '$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
+
+
 
 
 

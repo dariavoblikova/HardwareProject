@@ -46,7 +46,7 @@ SHIFT_NOTEA  MOVE.B   D4,D3
     BEQ     ROTATE
     CMP.B   #$08,D3
     BEQ     LOGICAL
-    BRA     INVALID
+    BRA     SHIFT_INVALID
       
 * determine if arithmetic left or right
 ARITHMETIC    MOVE.W  D4,D3     * store copy in D3 for masking
@@ -107,7 +107,6 @@ RIGHT_ARITH LEA ARITHR,A1
     CMP.W   #$1,D7
     BEQ     SHIFT_EA      * we know there is an EA, so skip REG_NUM
     BRA     REG_NUM
-    
 
 * finds count/register value    
 REG_NUM MOVE.W  D4,D1   * store copy in D1 for masking
@@ -153,7 +152,7 @@ SHIFT_EA    MOVE.B  D4,D3
         BEQ     SHIFT_WORD  * EA is absolute word addressing
         CMP.B   #$39,D3
         BEQ     SHIFT_LONG  * EA is absolute long addressing
-        BRA     INVALID
+        BRA     SHIFT_INVALIDEA
         
 SHIFT_IND   LEA ADDRI,A2
         LEA     ENDPAREN,A3
@@ -181,7 +180,7 @@ SHIFT_WORD
         LEA HEXSYMB,A2  * load string with '$' symbol in A2
         ADDI.L  #$2,D5
         CMP.L   A6,D5
-        BGE     INVALID     * past ending address
+        BGE     SHIFT_INVALID     * past ending address
         MOVEA.L D5,A3
         MOVE.W  (A3),D1     * move absolute word address to D1
         MOVE.W  #$4,D6      * store displacement
@@ -191,7 +190,7 @@ SHIFT_LONG  LEA HEXSYMB,A2  * load string with '$' symbol in A2
         MOVE.L  D5,D2
         ADDI.L  #$4,D2
         CMP.L   A6,D2
-        BGE     INVALID     * past ending address
+        BGE     SHIFT_INVALID     * past ending address
         ADDI.L  #$2,D5
         MOVEA.L D5,A3
         MOVE.L  (A3),D1     * move absolute word address to D1
@@ -284,7 +283,13 @@ SHIFT_PRINT   MOVE.B  #14,D0
         MOVE.B  #3,D0
         TRAP    #15
         BRA     SHIFT_END
-        
+  
+SHIFT_INVALID   JSR     INVALID
+            BRA     SHIFT_END 
+
+SHIFT_INVALIDEA JSR     INVALIDEA
+            BRA     SHIFT_END 
+      
 SHIFT_END   MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
 
@@ -309,6 +314,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 

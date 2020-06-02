@@ -40,7 +40,7 @@ MEM_REG_EA_MODE MOVE.B  D4,D3
         CMP.B   #$39,D3
         BEQ     MEM_REG_ABS_LONG  
         
-        BRA     MEM_REG_INVALID
+        BRA     MEM_REG_INVALIDEA
 
 * branch here to grab strings displaying '(AX)+'
 MEM_REG_POST_INC    LEA ADDRPAREN,A2
@@ -68,8 +68,8 @@ MEM_REG_ABS_WORD ADDI.L  #$2,D5
         LEA     HEX_SYMB,A1
         MOVE.B  #14,D0
         TRAP    #15
-        CMP.W   #$0000,D1
-        BEQ     MEM_REG_DISP_ADD
+        *CMP.W   #$0000,D1
+        *BEQ     MEM_REG_DISP_ADD
         *MOVE.B  #3,D0
         *TRAP    #15
         MOVE.L  D1, -(SP)   *safe replacement for trap 15
@@ -101,8 +101,8 @@ MEM_REG_ABS_LONG  ADDI.L  #$2,D5
         LEA     HEX_SYMB,A1
         MOVE.B  #14,D0
         TRAP    #15
-        CMP.L   #$00000000,D1
-        BEQ     MEM_REG_DISP_LONG
+        *CMP.L   #$00000000,D1
+        *BEQ     MEM_REG_DISP_LONG
         *MOVE.B  #3,D0
         *TRAP    #15
         MOVE.L  D1, -(SP)   *safe replacement for trap 15
@@ -111,26 +111,6 @@ MEM_REG_ABS_LONG  ADDI.L  #$2,D5
         MOVE.L  (SP)+, D1
         
         MOVEA.W #$0000,A1
-        LEA     COMMA_ADD,A1
-        MOVE.B  #14,D0
-        TRAP    #15
-        MOVE.L  #$0000,D1
-        CLR     D4
-        BRA     MEM_REG_A_RANGE
-        
-MEM_REG_DISP_ADD    LEA ZERO_ADD,A1
-        MOVE.B  #14,D0
-        TRAP    #15
-        LEA     COMMA_ADD,A1
-        MOVE.B  #14,D0
-        TRAP    #15
-        MOVE.L  #$0000,D1
-        CLR     D4
-        BRA     MEM_REG_A_RANGE
-        
-MEM_REG_DISP_LONG   LEA LONG_ADD,A1
-        MOVE.B  #14,D0
-        TRAP    #15
         LEA     COMMA_ADD,A1
         MOVE.B  #14,D0
         TRAP    #15
@@ -311,6 +291,9 @@ MEM_REG_SUB_DVALUE   MOVE.B  #14,D0
 
 MEM_REG_INVALID JSR     INVALID
             BRA     MEM_REG_DONE
+            
+MEM_REG_INVALIDEA JSR     INVALIDEA
+            BRA MEM_REG_DONE
 
 MEM_REG_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6  
              RTS
@@ -332,6 +315,9 @@ END_PAREN_COMMA DC.B    '),'      ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
+
+
 
 
 

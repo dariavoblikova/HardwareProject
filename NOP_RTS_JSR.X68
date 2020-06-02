@@ -39,6 +39,10 @@ NOP_RTS_JSR:                  ; first instruction of program
 SUB_INVALID    JSR     INVALID
             BRA     JSR_END
 
+* tell user that this isn't a valid EA   
+SUB_INVALIDEA   JSR     INVALIDEA
+            BRA     JSR_END
+
 * will print out that this is an NOP opcode   
 NOP_CASE    MOVE.L  #$2,D6  * store displacement in D6
             LEA NOP_M,A1
@@ -56,7 +60,7 @@ JSR_CASE    MOVE.L  D4,D3
             BEQ     JSR_INDIRECT    * if equal, we know address register indirect is EA
             CMP.B   #$B8,D3
             BEQ     JSR_ABSOLUTE
-            BRA     SUB_INVALID
+            BRA     SUB_INVALIDEA
 
 * check for address register we are using for EA
 JSR_INDIRECT    MOVE.L  #$2,D6  * store displacement in D6
@@ -89,15 +93,23 @@ JSR_ABSOLUTE    MOVE.L  D4,D3
             BEQ     JSR_WORD
             CMP.L   #$01,D3
             BEQ     JSR_LONG
-            BRA     SUB_INVALID
+            BRA     SUB_INVALIDEA
             
-JSR_WORD        MOVE.L  #$4,D6  * store displacement in D6
+JSR_WORD    MOVE.L  D5,D3
+            ADDI.L  #$4,D3
+            CMP.L   A6,D3   
+            BGT     SUB_INVALID
+            MOVE.L  #$4,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.W  (A0),D3
             BRA     JSR_ABS_PRINT            
 
-JSR_LONG        MOVE.L  #$6,D6  * store displacement in D6
+JSR_LONG    MOVE.L  D5,D3
+            ADDI.L  #$6,D3
+            CMP.L   A6,D3   
+            BGT     SUB_INVALID  
+            MOVE.L  #$6,D6  * store displacement in D6
             ADDI.L  #$2,D5  * add 2 to grab next instruction from memory
             MOVEA.L D5,A0 
             MOVE.L  (A0),D3
@@ -137,6 +149,8 @@ HEX_SYMBOL  DC.B    '$'      ,0
 INV_M       DC.B    'Not a valid NOP, RTS, or JSR opcode',0
 
     * END    NOP_RTS_JSR        ; last line of source
+
+
 
 
 

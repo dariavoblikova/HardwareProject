@@ -45,7 +45,7 @@ BCC:                  ; first instruction of program
 * tell user that this isn't a valid opcode   
 BCC_INVALID JSR INVALID
             BRA BCC_END
-    
+               
 * will print out that this is an Equals opcode   
 EQUAL   LEA opcode_BEQ,A1
         BRA BCC_DISPLACEMENT
@@ -120,6 +120,7 @@ BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back 
 
 
     *END    BCC        ; last line of source
+
 
 
 

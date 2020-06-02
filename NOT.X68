@@ -48,7 +48,7 @@ NOT_MODE  MOVE.L  D4,D3
         CMP.L   #$38,D3
         BEQ     NOT_ABSOLUTE    * EA is absolute addressing 
         
-        BRA     INVALID_NOT
+        BRA     INVALID_NOTEA
 
 * load string specifying EA is a data register
 NOT_DATA  LEA NOT_DREG, A3
@@ -94,7 +94,7 @@ NOT_ABSOLUTE
         CMP.L   #$01,D3
         BEQ     NOT_ABSOLUTE_LONG
 
-        BRA     INVALID_NOT
+        BRA     INVALID_NOTEA
 
 NOT_ABSOLUTE_WORD   MOVE.L  D5,D3
         ADDI.L  #$4,D3
@@ -150,6 +150,9 @@ NOT_ADDR_PRINT
 
 INVALID_NOT JSR INVALID
             BRA NOT_DONE
+            
+INVALID_NOTEA   JSR INVALIDEA
+            BRA NOT_DONE
         
 NOT_DONE    MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
                 RTS
@@ -165,6 +168,7 @@ NOT_ENDPAREN    DC.B    ')',0
 NOT_PREPAREN    DC.B    '-(A',0
 NOT_POSTPAREN   DC.B    ')+',0
 NOT_HEXSYMB     DC.B    '$',0
+
 
 
 
