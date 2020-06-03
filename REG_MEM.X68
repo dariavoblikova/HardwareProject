@@ -454,9 +454,9 @@ DATA_SLASH  DC.B    '/D'         ,0
 DATA_REG    DC.B    'D'          ,0
 ADDR_SLASH  DC.B    '/A'         ,0
 ADDR_REG    DC.B    'A'          ,0
-INDIRECT    DC.B    ',-(A'       ,0
+INDIRECT    DC.B    '-(A'       ,0
 ADDRPAREN   DC.B    '(A'        ,0
-ADDRPAREN_COMMA DC.B    ',(A'    ,0
+ADDRPAREN_COMMA DC.B    '(A'    ,0
 REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    '$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
