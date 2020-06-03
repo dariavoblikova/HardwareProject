@@ -1,0 +1,84 @@
+00009000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 6/2/2020 5:19:51 PM
+
+00000000                             1  *****************************
+00000000                             2  *
+00000000                             3  * demo_test.X68
+00000000                             4  *
+00000000                             5  * Created 12/05/2018
+00000000                             6  *
+00000000                             7  * Test program for CSS 422 Disassembler Project Demo
+00000000                             8  *
+00000000                             9  *****************************
+00000000                            10  
+00000000  =00009000                 11  start           EQU     $00009000       * ORG and END address
+00000000                            12  
+00000000                            13  * ORG the program so that it straddles the address boundary $00007FFF to $00008000
+00000000                            14  
+00009000                            15                  ORG     start
+00009000                            16  
+00009000                            17  NOP
+00009000  0841 0001                 18      BCHG        #1,D1   * illegal
+00009004  0881 0001                 19      BCLR        #1,D1   * illegal 
+00009008  4E75                      20      RTS
+0000900A  4E71                      21      NOP
+0000900C  4E75                      22      RTS
+0000900E  6E14                      23      BGT.B     label1
+00009010  6E1E                      24      BGT.B     label2
+00009012  6F10                      25      BLE.B     label1
+00009014  6F1A                      26      BLE.B     label2
+00009016                            27      
+00009016  6C0C                      28      BGE.B     label1    * illegal
+00009018  6C16                      29      BGE.B     label2    * illegal                
+0000901A  6D14                      30      BLT.B     label2    * illegal
+0000901C  6D00 0006                 31      BLT.W     label1    * illegal
+00009020                            32  
+00009020  4E71                      33      NOP
+00009022  4E75                      34      RTS
+00009024                            35  label1
+00009024  4E71                      36      NOP
+00009026  4E75                      37      RTS
+00009028  41F8 0012                 38      LEA       $12,A0
+0000902C  41F8 1234                 39      LEA       $1234,A0
+00009030                            40  label2
+00009030  7000                      41      MOVEQ     #$0,D0
+00009032  7012                      42      MOVEQ     #$12,D0
+00009034  70FF                      43      MOVEQ     #$FF,D0
+00009036                            44  label3
+00009036  E78A                      45      LSL.L     #$3,D2
+00009038                            46  label4
+00009038  6EFE                      47      BGT.B     label4
+0000903A  6EFC                      48      BGT.B     label4
+0000903C  6EFA                      49      BGT.B     label4
+0000903E  6F00 FFE4                 50      BLE.W     label1
+00009042  6F00 FFEC                 51      BLE.W     label2
+00009046  6F00 FFEE                 52      BLE.W     label3
+0000904A  6700 FFD8                 53      BEQ.W     label1
+0000904E  6700 FFE0                 54      BEQ.W     label2
+00009052  6700 FFE2                 55      BEQ.W     label3
+00009056  4EB9 00009024             56      JSR       label1
+0000905C  4EB9 00009030             57      JSR       label2
+00009062  4EB9 00009036             58      JSR       label3
+00009068                            59  
+00009068                            60  * Put program code here
+00009068                            61  
+00009068  FFFF FFFF                 62      SIMHALT             ; halt simulator
+0000906C                            63  
+0000906C                            64  * Put variables and constants here
+0000906C                            65  
+0000906C                            66      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+LABEL1              9024
+LABEL2              9030
+LABEL3              9036
+LABEL4              9038
+NOP                 9000
+START               9000

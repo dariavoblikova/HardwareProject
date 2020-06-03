@@ -25,6 +25,14 @@ EAERROR_MESSAGE                 DC.B    'Invalid EA.',0 *used for invalid effect
 PRESS_ENTER_PROMPT              DC.B    'Press ENTER key to continue', CR,LF,0
 QUIT_RESTART_PROMPT             DC.B    'Press q to quit, r to restart', CR,LF,0
 
+;MAIN_LOOP
+DATA_STRING                     DC.B    'DATA ',0
+
+
+
+
+
+
 
 
 

@@ -27,6 +27,8 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             
             * check if NOP/JSR/RTS opcode
             MOVE.W      D4,D3                       * use D3 for masking so we don't lose opcode in D4
+            CLR.L       D7
+            MOVE.W      D4,D7                       * use D7 for when we print invalid opcode as data( because we lose the opcode in D4 when we jsr to opcodes)
             ANDI.W      #$FF00,D3                   * mask word to look at leftmost byte
             CMP.W       #$4E00,D3                   * check if word could be a NOP, JSR, or RTS opcode
             BEQ         FOUREOP                     * branch to call subroutine that decodes this opcode
@@ -88,13 +90,15 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             MOVE.W D4, D3
             AND.W   #$F000, D3
             CMP.W   #$0000, D3
-            BEQ NOT_MOVE        *if =0 not ADD
+            BEQ DATA
             CMP.W   #$3000, D3
-            BGT NOT_MOVE        *if >3 not ADD
+            BGT DATA
             BRA MOVEOP
             
             
-NOT_MOVE    *add another opcode here*
+DATA        JSR INVALID
+            BRA LOOP_CHECK
+            
 LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode was invalid
             BNE         NOT_ERROR
             BSR         ERROR   
@@ -140,12 +144,21 @@ SHIFTOP     JSR         SHIFT_OPCODES
 
 
 * opcode error message can go in place of ERROR label (ex. XXXXXXXX DATA YYYY)
-ERROR:      LEA         GENERAL_ERROR, A1           * general error message
+ERROR:      LEA         DATA_STRING, A1             * data message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
-            ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
-            MOVE.B      #2, D6
-            RTS         NOT_ERROR
+            
+            LEA         TAB,A1                      * Print tab
+            MOVE.B      #14,D0                      * Stores task 14 in D0
+            TRAP        #15                         * Task 15, print tab
+                        
+            MOVE.L      D7,D1                       * Move current data(bad opcode) to D1 for printing
+            MOVE.B      #16,D2                      * Base 16 for for trap 15 task 15
+            MOVE.B      #15,D0                      * Task 15 for printing desired base
+            TRAP        #15                         * Trap 15, print current address
+
+            MOVE.B       #2,D6
+            BRA         NOT_ERROR
 
 EA_ERROR    LEA         EAERROR_MESSAGE,A1          * invalid EA error message
             MOVE.B      #14,D0                      * Stores task 14 in D0
@@ -199,6 +212,13 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
+
+
+
+
+
 
 
 
