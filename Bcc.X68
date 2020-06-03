@@ -95,7 +95,7 @@ BCC_OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console
         *TRAP    #15     * output new line
         BRA     BCC_END             * end subroutine once displacement is calculated
         
-BCC_SIXTEEN ADDI.L MOVE.L  D5,D2
+BCC_SIXTEEN MOVE.L  D5,D2
         ADDI.L  #$2,D2  
         CMP.L   A6,D2   * check if displacement word is out of bounds of memory we read
         BGE     BCC_INVALID
