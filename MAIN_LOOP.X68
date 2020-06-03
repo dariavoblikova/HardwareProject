@@ -93,7 +93,7 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             BEQ DATA
             CMP.W   #$3000, D3
             BGT DATA
-            BRA DATA
+            BRA MOVEOP                              * first nibble in MOVE and MOVEA is 1, 2, or 3
             
             
 DATA        JSR INVALID
@@ -212,6 +212,8 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
+
 
 
 
