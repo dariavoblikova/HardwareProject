@@ -95,8 +95,9 @@ BCC_OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console
         *TRAP    #15     * output new line
         BRA     BCC_END             * end subroutine once displacement is calculated
         
-BCC_SIXTEEN ADDI.L  #$2,D5  
-        CMP.L   A6,D5   * check if displacement word is out of bounds of memory we read
+BCC_SIXTEEN ADDI.L MOVE.L  D5,D2
+        ADDI.L  #$2,D2  
+        CMP.L   A6,D2   * check if displacement word is out of bounds of memory we read
         BGE     BCC_INVALID
         MOVEA.L D5,A2   * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next word
@@ -104,8 +105,9 @@ BCC_SIXTEEN ADDI.L  #$2,D5
         MOVE.W  #$4,D6  * store displacement in D6
         BRA     BCC_OUTPUT  * output displacement to display
         
-BCC_THIRTYTWO   ADDI.L  #$4,D5
-        CMP.L   A6,D5
+BCC_THIRTYTWO   MOVE.L  D5,D2
+        ADDI.L  #$4,D2
+        CMP.L   A6,D2
         BGE     BCC_INVALID  
         MOVEA.L  D5,A2 * stores memory location of PC in address register
         ADD.W   #$2,A2  * increment memory location to look at next long
