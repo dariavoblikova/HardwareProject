@@ -4,7 +4,7 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-INVALIDEA:   MOVE.B  #$A,D6  * indicates invalid opcode, impossible to have displacement of 1
+INVALIDEA:   MOVE.B  #$B,D6  * indicates invalid opcode, impossible to have displacement of 1
         RTS
                ; first instruction of program
 
