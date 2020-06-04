@@ -101,7 +101,7 @@ DATA        JSR INVALID
             
 LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode was invalid
             BNE         NOT_ERROR
-            BSR         ERROR   
+            BRA         ERROR   
 NOT_ERROR   ADD.L       D6, A5                      * Increment current address by displacement
             
             LEA         NEWLINE,A1                  * Print new line
@@ -212,6 +212,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 
