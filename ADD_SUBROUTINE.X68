@@ -7,6 +7,25 @@
 * displays what can be deduced about the original command.
 *-----------------------------------------------------------
 ADD_SUBROUTINE:
+*error checking*
+            MOVE.W D4, D3
+            AND.W #$F1C0, D3
+            CMP.W #$D0C0, D3    *ADDA can have weird opmodes
+            BEQ ADDGOOD
+            CMP.W #$D1C0, D3    *ADDA can have weird opmodes
+            BEQ ADDGOOD
+            *check valid opmode       
+            MOVE.W D4, D3
+            AND.W #$01C0, D3
+            CMP.W #$00C0, D3
+            BEQ ADDBAD *if opmode is 3 then it's not ADD
+            CMP.W #$01C0, D3
+            BGE ADDBAD *if opmode is >= 7 then it's not ADD
+            
+            BRA ADDGOOD
+ADDBAD      MOVE.L #$FFFFFFFF, D6
+            RTS
+ADDGOOD
 ************************************************************************    
 * initial parsing: D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode
 ************************************************************************
@@ -30,7 +49,7 @@ ADD_SUBROUTINE:
 T       MOVE.B  #$02,   D6
         BRA PI
 *post then
-PT      CMP.B   #$07,   D2  *if opmode == 7 then it's either abs w, abs l, or immediate. otherwise, error
+PT      CMP.B   #$07,   D2  *if ea mode == 7 then it's either abs w, abs l, or immediate. otherwise, error
         BNE MODE_ERROR
         *now that it's been proven, check which of the three it is
         CMP.B   #$00,   D1 *if reg == 0 ($.W)
@@ -82,10 +101,7 @@ PI
 ************************************************************************    
 * display
 ************************************************************************
-        CMP.B #$03, D3
-        BEQ ADDAT       *if opmode == 3 then ADDA
-        CMP.B #$07, D3
-        BEQ ADDAT       *if opmode == 7 then ADDA
+        
         
 
         
@@ -109,7 +125,12 @@ IS_SUB  LEA SUBDOT, A1      *if so load 'SUB.' instead
         BRA ADD_P           *branch to ADD_PRINT which resets the stack and prints
 IS_ADDQ LEA ADDQ_ST, A1
         BRA ADD_P
-IS_ADD  LEA ADDDOT, A1      *print 'ADD.'
+IS_ADD  CMP.B #$03, D3
+        BEQ ADDAT       *if opmode == 3 then ADDA
+        CMP.B #$07, D3
+        BEQ ADDAT       *if opmode == 7 then ADDA
+        
+        LEA ADDDOT, A1      *otherwise print 'ADD.'
 ADD_P   MOVE.L (SP)+, D0
         BSR PRINT
         MOVE.B  D3, -(SP)   *we're going to modify D3 so store it 
@@ -160,15 +181,23 @@ EADEST  BSR EAPRINT
         BSR PRINTHEX
         BRA ADD_END
         
-ADDAT           LEA ADDA_ST, A1       *ADDA section
+ADDAT           MOVE.L (SP)+, D0
+                LEA ADDA_ST, A1       *ADDA section
                 BSR PRINT       
                 CMP.B #$03, D3        *if opmode = 3 then sign extended word
                 BNE ADDA_L_CHECK
+                
+                MOVE.B #$04, D6
+                MOVE.B #$01, D3 *ADDA has different opmode values
                 LEA WDISP, A1
                 BSR PRINT
                 BRA ADDA_PRINT
-ADDA_L_CHECK    LEA LDISP, A1
+                
+ADDA_L_CHECK    MOVE.B #$06, D6
+                MOVE.B #$02, D3 *ADDA has different opmode values
+                LEA LDISP, A1
                 BSR PRINT
+                
 ADDA_PRINT      LEA SPACE, A1
                 BSR PRINT
                 BSR EAPRINT
@@ -177,6 +206,16 @@ ADDA_PRINT      LEA SPACE, A1
                 LEA ADISP, A1
                 BSR PRINT
                 BSR PRINTHEX
+                
+                CMP.B #$07, D2      *is it $W or $L?
+                BNE ADD_END
+                CMP.B #$00, D1      *is it $W?
+                BNE ADDA_CHK_LA
+                MOVE.B #$04, D6     *if so displacement is 4 (ADDA's weird opmode checks interfere with displacement so we have to do it here)
+                BRA ADD_END
+ADDA_CHK_LA     CMP.B #$01, D1      *is it $L?
+                BNE ADD_END
+                MOVE.B #$06, D6              
                 BRA ADD_END
 *D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode         for ADD
 *D0 = register ; D1 = EA reg ; D2 = EA mode ; D3 = opmode   for ADDQ
@@ -245,6 +284,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 

@@ -8,7 +8,14 @@
 *-----------------------------------------------------------
 
 MOVE_SUBROUTINE:
-            MOVE.L D5, -(SP)    *store so we can use it
+            *check for size error*
+            MOVE.W D4, D3
+            AND.W #$F000, D3
+            CMP.W #$1000, D3
+            BGT MVSGOOD
+            MOVE.L #$FFFFFFFF, D6
+            RTS
+MVSGOOD     MOVE.L D5, -(SP)    *store so we can use it
 ************************************************************************    
 * print opcode, size
 ************************************************************************
@@ -28,6 +35,7 @@ MOVE_PRINT2 BSR PRINT           *print whichever was loaded
             BEQ MOVE_PRINTW
             CMP.W   #$2000, D0  *why? why is long less than word? 
             BEQ MOVE_PRINTL
+            
 MOVE_PRINTB LEA BDISP, A1   *load byte display
             *since it's convenient format opmode size here*
             MOVE.L #$00000000, D3
@@ -39,6 +47,7 @@ MOVE_PRINTW LEA WDISP, A1   *load word display
 MOVE_PRINTL LEA LDISP, A1   *load long display
             *since it's convenient format opmode size here*
             MOVE.L #$00000002, D3
+            
 POST_MOVE_SIZE 
             BSR PRINT       *print size
             LEA SPACE, A1   *print a space ('MOVE.X ' or 'MOVEA.X ')
@@ -100,9 +109,11 @@ MV_WADDR        ADD.L   #$00000002, D6  *word address is 2 extra bytes
                 BRA POST_MV_INC1    * go to end
 MV_IMM          ADD.L   D3, D6                    
                 ADD.L   D3, D6    *increment = size*2 + 2 if mode is #<>
-POST_MV_INC1    *TODO: check increment out of bounds here*
+POST_MV_INC1    *insert increment checking here*
                 RTS
                 
+
+
 
 
 

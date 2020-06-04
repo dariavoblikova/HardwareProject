@@ -2,10 +2,11 @@
 CR  EQU $0D
 LF  EQU $0A
 LN          DC.B '',CR,LF,0
-MERROR      DC.B 'ERROR PARSING MODE',CR,LF,0
-EAREGERROR  DC.B 'ERROR PARSING EA REG',CR,LF,0
-EAMODERROR  DC.B 'ERROR PARSING EA MODE',CR,LF,0
-RERROR      DC.B 'ERROR: OUT OF BOUNDS',CR,LF,0
+MERROR      DC.B 'ERROR PARSING MODE',0
+EAREGERROR  DC.B 'ERROR PARSING EA REG',0
+EAMODERROR  DC.B 'ERROR PARSING EA MODE',0
+OPMODE_ERROR DC.B 'ERROR PARSING OPMODE',0
+RERROR      DC.B 'ERROR: OUT OF BOUNDS',0
 BDISP       DC.B 'B',0
 WDISP       DC.B 'W',0
 LDISP       DC.B 'L',0
@@ -201,7 +202,7 @@ PEAT6   CMP.B #$01,     D1  *is it $.L
         BEQ EAT7
         BRA PEAT7
 
-EAT7    LEA     MONEY,  A1  *it is $.W
+EAT7    LEA     MONEY,  A1  
         BSR     PRINT   
         MOVE.L  D5,     -(SP) *store states
         MOVE.L  D0,     -(SP)
@@ -214,8 +215,12 @@ EAT7    LEA     MONEY,  A1  *it is $.W
         MOVE.L  (SP)+,   D5
         RTS
         
-PEAT7   LEA     HEXI,   A1
+PEAT7   CMP.B #$04,     D1
+        BNE EAMODE_ERROR
+        LEA     HEXI,   A1
         BSR     PRINT
+        CMP.B   #$07,   D3
+        BGE     EAPOPMODE_ERROR
         CMP.B   #$01,   D3  
         BLT     PBYTET   * < 1 byte, #$AB
         BEQ     PWORDT   * = 1 word, #$ABCD
@@ -273,7 +278,10 @@ PLONGT  MOVE.L  D5,     -(SP) *store states
 EAMODE_ERROR    LEA EAMODERROR, A1    
                 BSR PRINT
                 RTS
-                
+
+EAPOPMODE_ERROR    LEA OPMODE_ERROR, A1
+                BSR PRINT
+                RTS                
  
 
 * prints D0
@@ -468,6 +476,16 @@ PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
 
 
+
+
+OPMODE_CHECK:
+     CMP.B #$03, D2
+     BEQ OPMCHKERR
+     CMP.B #$07, D2
+     BGE OPMCHKERR
+     BRA OPMCHKG
+OPMCHKERR   MOVE.L #$FFFFFFFF, D6
+OPMCHKG     RTS
 
 
 

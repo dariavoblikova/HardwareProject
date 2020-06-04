@@ -1,6 +1,6 @@
 00009000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/26/2020 12:28:01 AM
+Created On: 6/3/2020 8:11:23 PM
 
 00000000                             1  *****************************
 00000000                             2  *
@@ -17,29 +17,18 @@ Created On: 5/26/2020 12:28:01 AM
 00000000                            13  * ORG the program so that it straddles the address boundary $00007FFF to $00008000
 00000000                            14  
 00009000                            15                  ORG     start
-00009000                            16  
-00009000                            17  NOP
-00009000  4E75                      18      RTS
-00009002  4E71                      19      NOP
-00009004  4E75                      20      RTS
-00009006  4E90                      21      JSR       (A0)
-00009008  4EB8 1234                 22      JSR       $1234
-0000900C  4EB9 12345678             23      JSR       $12345678
-00009012  4EB9 0000901C             24      JSR       label1
-00009018  4E71                      25      NOP
-0000901A  4E75                      26      RTS
-0000901C                            27  label1
-0000901C  4E71                      28      NOP
-0000901E  4E75                      29      RTS
-00009020  4EB9 0000901C             30      JSR       label1
-00009026                            31  
-00009026                            32  * Put program code here
-00009026                            33  
-00009026  FFFF FFFF                 34      SIMHALT             ; halt simulator
-0000902A                            35  
-0000902A                            36  * Put variables and constants here
-0000902A                            37  
-0000902A                            38      END    START        ; last line of source
+00009000                            16          
+00009000  0681 12345678             17          ADD.L #$12345678, D1
+00009006  0641 1234                 18          ADD.W #$1234, D1
+0000900A  0641 1234                 19          ADD.W #$1234, D1
+0000900E                            20  
+0000900E                            21  * Put program code here
+0000900E                            22  
+0000900E  FFFF FFFF                 23      SIMHALT             ; halt simulator
+00009012                            24  
+00009012                            25  * Put variables and constants here
+00009012                            26  
+00009012                            27      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -48,6 +37,4 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-LABEL1              901C
-NOP                 9000
 START               9000

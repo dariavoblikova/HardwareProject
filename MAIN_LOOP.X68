@@ -67,7 +67,7 @@ CONTINUE_MAIN_LOOPS JSR PRINT_CURR_ADDR             * Print current memory locat
             *check if ADDQ opcode
             CMP.W   #$5000, D3
             BEQ ADDOP
-            
+MLAFTERADD            
             *check if NOT opcode
             MOVE.W  D4, D3
             AND.W   #$FF00, D3
@@ -101,7 +101,7 @@ DATA        JSR INVALID
             
 LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode was invalid
             BNE         NOT_ERROR
-            BSR         ERROR   
+            BRA         ERROR   
 NOT_ERROR   ADD.L       D6, A5                      * Increment current address by displacement
             
             LEA         NEWLINE,A1                  * Print new line
@@ -122,9 +122,16 @@ MOVEQOP     JSR MOVEQ
             BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
+            CMP.L #$FFFFFFFF, D6
+            BEQ ADDOPERR
             BRA LOOP_CHECK
+            
+ADDOPERR    MOVE.L #$00000002, D6
+            BRA ERROR
 
 MOVEOP      JSR MOVE_SUBROUTINE
+            CMP.L #$FFFFFFFF, D6
+            BEQ ADDOPERR
             BRA  LOOP_CHECK       
         
 FOUREOP     JSR         NOP_RTS_JSR                 * subroutine to decode one of three opcodes
@@ -144,7 +151,7 @@ SHIFTOP     JSR         SHIFT_OPCODES
 
 
 * opcode error message can go in place of ERROR label (ex. XXXXXXXX DATA YYYY)
-ERROR:      LEA         DATA_STRING, A1             * data message
+ERROR       LEA         DATA_STRING, A1             * data message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
             
@@ -212,6 +219,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 
