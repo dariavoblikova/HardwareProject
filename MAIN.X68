@@ -17,7 +17,7 @@ MAIN    ORG    $1000
     TRAP        #15                         Task 15, print new line
 
     JSR         MAIN_LOOP                   Located in MAIN_LOOP.X68 file
-    JSR         INPUT_QUIT_RESTART          Located in I_O_SUBROUTINE
+    BRA         INPUT_QUIT_RESTART          Located in I_O_SUBROUTINE
     
 *-----------------------------------------------------------
     * The order of includes is important!!
