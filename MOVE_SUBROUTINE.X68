@@ -8,13 +8,16 @@
 *-----------------------------------------------------------
 
 MOVE_SUBROUTINE:
-            *check for size error*
-            MOVE.W D4, D3
-            AND.W #$F000, D3
-            CMP.W #$1000, D3
-            BGT MVSGOOD
-            MOVE.L #$FFFFFFFF, D6
-            RTS
+*            *check for size error*
+*            MOVE.W D4, D3
+*            AND.W #$F000, D3
+*            CMP.W #$3000, D3
+*            BGT MVSBAD
+*            CMP.W #$0000, D3
+*            BEQ MVSBAD
+*            BRA MVSGOOD
+*MVSBAD      MOVE.L #$FFFFFFFF, D6
+*            RTS
 MVSGOOD     MOVE.L D5, -(SP)    *store so we can use it
 ************************************************************************    
 * print opcode, size
@@ -112,6 +115,7 @@ MV_IMM          ADD.L   D3, D6
 POST_MV_INC1    *insert increment checking here*
                 RTS
                 
+
 
 
 

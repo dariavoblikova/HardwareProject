@@ -7,7 +7,7 @@
 * displays what can be deduced about the original command.
 *-----------------------------------------------------------
 ADD_SUBROUTINE:
-*error checking*
+*error checking -- SUB vs SUBA is determined by opmode, and SUBA is not desired*
             MOVE.W D4, D3
             AND.W #$F1C0, D3
             CMP.W #$D0C0, D3    *ADDA can have weird opmodes
@@ -284,6 +284,7 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
 
 
 

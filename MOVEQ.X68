@@ -32,9 +32,14 @@ MOVEQ_DATA  MOVE.L  D4,D3
     TRAP    #15
     LEA     MOVEQ_POUND,A1
     TRAP    #15
+    LEA     MONEY, A1
+    TRAP    #15
     MOVE.L  D1, -(SP)   *safe replacement for trap 15
     MOVE.L  D1, D0
-    BSR ADAPTIVE_PRINTREG
+    ROR.B #4, D0
+    BSR PRINTHEX
+    ROR.B #4, D0
+    BSR PRINTHEX        *only print a byte as MOVEQ is restricted to byte
     MOVE.L  (SP)+, D1
     LEA     MOVEQ_COMMA,A1
     MOVE.L  #14,D0
@@ -64,6 +69,7 @@ MOVEQ_POUND DC.B    '#',0
 MOVEQ_COMMA DC.B    ',',0
 
     *END    MOVEQ        ; last line of source
+
 
 
 *~Font name~Courier New~
