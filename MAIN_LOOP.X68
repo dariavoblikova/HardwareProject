@@ -100,8 +100,10 @@ DATA        JSR INVALID
             BRA LOOP_CHECK
             
 LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode was invalid
-            BNE         NOT_ERROR
-            BRA         ERROR   
+            BEQ         ERROR   
+            CMP.W       #$B,D6
+            BEQ         EA_ERROR
+            BNE         NOT_ERROR 
 NOT_ERROR   ADD.L       D6, A5                      * Increment current address by displacement
             
             LEA         NEWLINE,A1                  * Print new line
@@ -170,7 +172,7 @@ ERROR       LEA         DATA_STRING, A1             * data message
 EA_ERROR    LEA         EAERROR_MESSAGE,A1          * invalid EA error message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print new line
-            ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
+            *ADD.B       #01,LINECOUNTER             * Printed an error, need to increment line counter
             MOVE.B      #2, D6
             BRA         NOT_ERROR           
 
