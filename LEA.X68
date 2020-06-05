@@ -28,7 +28,7 @@ LEA_INDIRECT  LEA   LEA_ADDRPAREN,A2
     MOVE.L  D4,D3
     ANDI.L  #$07,D3
     MOVE.L  #$2,D6
-    BRA     LEA_PRINT
+    BRA     LEA_PRINTINDIRECT
 
 LEA_ABSOLUTE  LEA LEA_HEXSYMB,A2
     LEA     LEA_COMMA,A3  
@@ -59,6 +59,28 @@ LEA_LONG MOVE.L  D5,D3
         MOVE.L  (A5),D3
         MOVE.L  #$6,D6
         BRA     LEA_PRINT 
+
+LEA_PRINTINDIRECT  LEA LEA_CODE,A1
+    MOVE.L  #14,D0
+    TRAP    #15
+    MOVEA.L A2,A1
+    TRAP    #15
+    MOVE.L  D3,D1
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR PRINTHEX
+    MOVE.L  (SP)+, D1
+    MOVEA.L A3,A1
+    MOVE.L  #14,D0
+    TRAP    #15
+    LEA     LEA_ADDR,A1
+    TRAP    #15
+    MOVE.L  D2,D1
+    MOVE.L  D1, -(SP)   *safe replacement for trap 15
+    MOVE.L  D1, D0
+    BSR PRINTHEX
+    MOVE.L  (SP)+, D1
+    BRA     LEA_DONE 
 
 LEA_PRINT   LEA LEA_CODE,A1
     MOVE.L  #14,D0
@@ -96,6 +118,7 @@ LEA_ENDPAREN    DC.B    '),',0
 LEA_HEXSYMB     DC.B    '$',0
 LEA_COMMA       DC.B    ',',0
 LEA_ADDR        DC.B    'A',0
+
 
 
 
