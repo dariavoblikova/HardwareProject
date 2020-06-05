@@ -89,12 +89,13 @@ MLAFTERADD
             *check if MOVE opcode
             MOVE.W D4, D3
             AND.W   #$F000, D3
-            CMP.W   #$0000, D3
-            BEQ DATA
+            CMP.W   #$1000, D3  *if it's not zero
+            BEQ MOVEOP
+            CMP.W   #$2000, D3
+            BEQ MOVEOP
             CMP.W   #$3000, D3
-            BGT DATA
-            BRA MOVEOP                              * first nibble in MOVE and MOVEA is 1, 2, or 3
-            
+            BEQ MOVEOP
+            BRA DATA
             
 DATA        JSR INVALID
             BRA LOOP_CHECK
@@ -104,6 +105,7 @@ LOOP_CHECK  CMP.W       #$1,D6                      * our check to see if opcode
             CMP.W       #$B,D6
             BEQ         EA_ERROR
             BNE         NOT_ERROR 
+            
 NOT_ERROR   ADD.L       D6, A5                      * Increment current address by displacement
             
             LEA         NEWLINE,A1                  * Print new line
@@ -124,7 +126,7 @@ MOVEQOP     JSR MOVEQ
             BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
-            CMP.L #$FFFFFFFF, D6
+            CMP.L #$FFFFFFFF, D6    *CHANGE TO 1
             BEQ ADDOPERR
             BRA LOOP_CHECK
             
@@ -221,6 +223,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 
