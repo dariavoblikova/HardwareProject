@@ -2,7 +2,9 @@
 * Title      :
 * Written by :
 * Date       :
-* Description:
+* Description: This subroutine decodes MOVEM in the case that
+the dr field bit is set to 0, which tells us that this is a 
+register to memory direction of transfer.
 *-----------------------------------------------------------
 REG_MEM:                  ; first instruction of program
     MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
