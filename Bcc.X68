@@ -86,13 +86,15 @@ BCC_OUTPUT  MOVE.B  #14,D0  * output Bcc opcode to console
         TRAP    #15
         LEA     SPACE,A1    * create empty space between opcode
         TRAP    #15
+        
+        LEA         MONEY, A1
+        MOVE.B      #14,D0
+        TRAP        #15
+            
         MOVE.B  #16,D2  * output displacement in base 16 (hexadecimal)
         MOVE.B  #15,D0  * move trap task into D0
         TRAP    #15     * outputs displacement to console
         
-        *LEA     NEWL,A1 * makes a new line for outputting next opcode
-        *MOVE.B  #14,D0  * move trap task to D0
-        *TRAP    #15     * output new line
         BRA     BCC_END             * end subroutine once displacement is calculated
         
 BCC_SIXTEEN MOVE.L  D5,D2
@@ -117,6 +119,7 @@ BCC_THIRTYTWO   MOVE.L  D5,D2
 
 BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
+
 
 
 
