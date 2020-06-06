@@ -118,10 +118,6 @@ BCC_THIRTYTWO   MOVE.L  D5,D2
 BCC_END     MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
 
-    *SIMHALT             ; halt simulator
-
-
-    *END    BCC        ; last line of source
 
 
 
