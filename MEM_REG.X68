@@ -140,7 +140,8 @@ MEM_REG_REG_RANGE MOVE.B  D4,D3 * move opcode word to D3
         *TRAP    #15
         MOVE.L  D1, -(SP)   *safe replacement for trap 15
         MOVE.L  D1, D0
-        BSR ADAPTIVE_PRINTREG
+        *BSR ADAPTIVE_PRINTREG
+        BSR PRINTHEX    *test
         MOVE.L  (SP)+, D1
         
         MOVEA.L   A3,A1
@@ -315,6 +316,7 @@ END_PAREN_COMMA DC.B    '),'      ,0
 *HEX_SYMB    DC.B    '$'          ,0
 *ZERO_ADD    DC.B    '0000'        ,0
 *LONG_ADD    DC.B    '00000000'    ,0
+
 
 
 

@@ -408,7 +408,8 @@ REG_MEM_PRINT
         
         MOVE.L  D1, -(SP)   *safe replacement for trap 15
         MOVE.L  D1, D0
-        BSR ADAPTIVE_PRINTREG
+        *BSR ADAPTIVE_PRINTREG
+        BSR PRINTHEX
         MOVE.L  (SP)+, D1
         
         
@@ -461,6 +462,7 @@ REND_PAREN   DC.B    ')'          ,0
 HEX_SYMB    DC.B    '$'         ,0
 ZERO_ADD    DC.B    '000'       ,0
 LONG_ADD    DC.B    '0000000'   ,0
+
 
 
 
