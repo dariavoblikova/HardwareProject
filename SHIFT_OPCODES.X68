@@ -293,8 +293,6 @@ SHIFT_INVALIDEA JSR     INVALIDEA
 SHIFT_END   MOVEM.L     (SP)+, D0-D5/D7/A0-A6          * pop the registers back except for D6
             RTS     *Return to subroutine here
 
-    *SIMHALT             ; halt simulator
-
 * Put variables and constants here
 ROTATEL DC.B    'ROL',0
 ROTATER DC.B    'ROR',0
@@ -314,6 +312,7 @@ ENDPAREN    DC.B    ')',0
 POSTPAREN   DC.B    ')+',0
 SPACE       DC.B    '   ',0
 HEXSYMB     DC.B    '$',0
+
 
 
 
