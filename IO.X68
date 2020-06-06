@@ -27,29 +27,6 @@ AND_ST      DC.B 'AND.',0
 OR_ST       DC.B 'OR.',0
 POUND       DC.B '#',0
 ADDQ_ST     DC.B 'ADDQ.',0
-**********************REFER TO STRINGS************************
-*SPACE       DC.B ' ',0
-*COMMA       DC.B ',',0
-*opcode_BEQ  DC.B 'BEQ ',0 
-*opcode_BLE  DC.B 'BLE ',0
-*opcode_BGT  DC.B 'BGT ',0
-*opcode_BRA  DC.B 'BRA ',0
-*ROTATEL DC.B    'ROL',0
-*ROTATER DC.B    'ROR',0
-*ARITHL  DC.B    'ASL',0
-*ARITHR  DC.B    'ASR',0
-*LOGICALL    DC.B    'LSL',0
-*LOGICALR    DC.B    'LSR',0
-*SIZEB   DC.B    '.B     ',0
-*SIZEW   DC.B    '.W     ',0
-*SIZEL   DC.B    '.L     ',0
-*DATAR   DC.B    'D',0
-*POUNDSIGN   DC.B    '#',0
-*ADDRI   DC.B    '(A',0
-*PREPAREN  DC.B  '-(A',0
-*ENDPAREN    DC.B    ')',0
-*POSTPAREN   DC.B    ')+',0
-*HEXSYMB     DC.B    '$',0
 **********************HEX DIGITS*******************************
 HEX0        DC.B '0',0 
 HEX1        DC.B '1',0
@@ -476,16 +453,6 @@ PHEND   MOVE.B (SP)+, D0    *restore stack at the end
         RTS 
 
 
-
-
-OPMODE_CHECK:
-     CMP.B #$03, D2
-     BEQ OPMCHKERR
-     CMP.B #$07, D2
-     BGE OPMCHKERR
-     BRA OPMCHKG
-OPMCHKERR   MOVE.L #$FFFFFFFF, D6
-OPMCHKG     RTS
 
 
 
