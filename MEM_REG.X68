@@ -3,9 +3,10 @@
 * Written by :
 * Date       :
 * Description: This file decodes the MOVEM opcode in the case 
-that the dr field bit is set to 1. Meaning that the EA
-is the source operand and the destination operand is the list
-of registers.
+* that the dr field bit is set to 1, representing that the direction
+* of transfer is from memory to register. Meaning that the EA
+* is the source operand and the destination operand is the list
+* of registers.
 *-----------------------------------------------------------
 
 MEM_REG:    MOVEM.L     D0-D5/D7/A0-A6, -(SP)          * save all registers except for D6
