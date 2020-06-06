@@ -448,8 +448,8 @@ D   JSR C
     *and testing*
     *AND.B byte
     AND.B D0,    D1
-    DIVU D1, D2
     AND.B D0,    (A1)
+    DIVU D1, D2
     AND.B D0,    (A1)+
     AND.B D0,    -(A1)
     AND.B D0,    $1234
@@ -591,6 +591,7 @@ D   JSR C
 
     SIMHALT             ; halt simulator
     END    START        ; last line of source
+
 
 
 *~Font name~Courier New~
