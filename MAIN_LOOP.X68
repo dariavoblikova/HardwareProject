@@ -126,16 +126,9 @@ MOVEQOP     JSR MOVEQ
             BRA LOOP_CHECK
 
 ADDOP       JSR ADD_SUBROUTINE
-            CMP.L #$FFFFFFFF, D6    *CHANGE TO 1
-            BEQ ADDOPERR
             BRA LOOP_CHECK
-            
-ADDOPERR    MOVE.L #$00000002, D6
-            BRA ERROR
 
 MOVEOP      JSR MOVE_SUBROUTINE
-            CMP.L #$FFFFFFFF, D6
-            BEQ ADDOPERR
             BRA  LOOP_CHECK       
         
 FOUREOP     JSR         NOP_RTS_JSR                 * subroutine to decode one of three opcodes
@@ -163,10 +156,6 @@ ERROR       LEA         DATA_STRING, A1             * data message
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print tab
                         
-            LEA         MONEY, A1
-            MOVE.B      #14,D0
-            TRAP        #15
-
             MOVE.L      D7,D1                       * Move current data(bad opcode) to D1 for printing
             MOVE.B      #16,D2                      * Base 16 for for trap 15 task 15
             MOVE.B      #15,D0                      * Task 15 for printing desired base

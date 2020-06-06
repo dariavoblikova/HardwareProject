@@ -8,17 +8,7 @@
 *-----------------------------------------------------------
 
 MOVE_SUBROUTINE:
-*            *check for size error*
-*            MOVE.W D4, D3
-*            AND.W #$F000, D3
-*            CMP.W #$3000, D3
-*            BGT MVSBAD
-*            CMP.W #$0000, D3
-*            BEQ MVSBAD
-*            BRA MVSGOOD
-*MVSBAD      MOVE.L #$FFFFFFFF, D6
-*            RTS
-MVSGOOD     MOVE.L D5, -(SP)    *store so we can use it
+            MOVE.L D5, -(SP)    *store so we can use it
 ************************************************************************    
 * print opcode, size
 ************************************************************************
@@ -110,11 +100,17 @@ MV_ADR_CHK      CMP.B   #$04, D1    *mode == 7 reg == 4 then immediate displacem
                 BRA POST_MV_INC1    *go to end
 MV_WADDR        ADD.L   #$00000002, D6  *word address is 2 extra bytes
                 BRA POST_MV_INC1    * go to end
-MV_IMM          ADD.L   D3, D6                    
-                ADD.L   D3, D6    *increment = size*2 + 2 if mode is #<>
+MV_IMM          MOVE.L  D3, -(SP)
+                LSR.L #1, D3
+                ADDI.L #1, D3   * + 1
+                LSL.L #1, D3    * ) * 2         increment = (size/2+1)*2 if mode is #<>
+                ADD.L D3, D6
+                MOVE.L (SP)+, D3
 POST_MV_INC1    *insert increment checking here*
                 RTS
                 
+
+
 
 
 

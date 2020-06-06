@@ -23,7 +23,7 @@ ADD_SUBROUTINE:
             BGE ADDBAD *if opmode is >= 7 then it's not ADD
             
             BRA ADDGOOD
-ADDBAD      MOVE.L #$FFFFFFFF, D6
+ADDBAD      MOVE.L #$00000001, D6
             RTS
 ADDGOOD
 ************************************************************************    
@@ -36,7 +36,7 @@ ADDGOOD
         BSR     DREG_PARSE      *parse above labels
         BSR     REG_PARSE
         BSR     MODE_PARSE
-        BSR     OPMODE_PARSE
+        BSR     OPMODE_PARSE 
 
 ************************************************************************    
 * increment parsing
@@ -70,7 +70,12 @@ PT3     CMP.B   #$04,   D1  *if reg == 4 (#<>)
         BEQ T4
         BRA EREG_ERROR      *if it isn't any of the above a bad input has been given
 *then
-T4      AND.B #$03, D3  *only keep the last two bits
+T4      CMP.B #$03, D3  *if it's made it here with 3 or 7 it must be ADDA
+        BEQ     WORDT
+        CMP.B #$07, D3
+        BEQ     LONGT
+
+        AND.B #$03, D3  *only keep the last two bits
         CMP.B #$01, D3  
         BLT     BYTET   * < 1 byte.
         BEQ     WORDT   * = 1 word.
@@ -187,13 +192,13 @@ ADDAT           MOVE.L (SP)+, D0
                 CMP.B #$03, D3        *if opmode = 3 then sign extended word
                 BNE ADDA_L_CHECK
                 
-                MOVE.B #$04, D6
+               *MOVE.B #$04, D6
                 MOVE.B #$01, D3 *ADDA has different opmode values
                 LEA WDISP, A1
                 BSR PRINT
                 BRA ADDA_PRINT
                 
-ADDA_L_CHECK    MOVE.B #$06, D6
+ADDA_L_CHECK   *MOVE.B #$06, D6
                 MOVE.B #$02, D3 *ADDA has different opmode values
                 LEA LDISP, A1
                 BSR PRINT
@@ -211,11 +216,11 @@ ADDA_PRINT      LEA SPACE, A1
                 BNE ADD_END
                 CMP.B #$00, D1      *is it $W?
                 BNE ADDA_CHK_LA
-                MOVE.B #$04, D6     *if so displacement is 4 (ADDA's weird opmode checks interfere with displacement so we have to do it here)
+               *MOVE.B #$04, D6     *if so displacement is 4 (ADDA's weird opmode checks interfere with displacement so we have to do it here)
                 BRA ADD_END
 ADDA_CHK_LA     CMP.B #$01, D1      *is it $L?
                 BNE ADD_END
-                MOVE.B #$06, D6              
+               *MOVE.B #$06, D6              
                 BRA ADD_END
 *D0 = Dn ; D1 = EA reg ; D2 = EA mode ; D3 = opmode         for ADD
 *D0 = register ; D1 = EA reg ; D2 = EA mode ; D3 = opmode   for ADDQ
@@ -284,6 +289,8 @@ RANGE_ERROR: MOVE.L (SP)+, D5 *maintain stack idempotency
 
     *SIMHALT
     *;END    START        ; last line of source
+
+
 
 
 
