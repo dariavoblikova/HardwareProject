@@ -1,4 +1,4 @@
-# "HardwareProject. Disassembler" 
+# HardwareProject. Disassembler
 
 * Scans a section of memory
 * Attempts to convertthe memory’s contents to a listing of valid assembly language instructions
@@ -11,26 +11,26 @@ I/O
 
 
 ## Supported Opcodes:
-NOP
-MOVE, MOVEQ, MOVEM, MOVEA
-ADD, ADDA, ADDQ
-SUB
-LEA
-AND,OR,NOT
-LSL, LSR, ASL, ASR
-ROL,ROR
-Bcc (BGT, BLE, BEQ)
-JSR, RTS
-BRA
+NOP  
+MOVE, MOVEQ, MOVEM, MOVEA  
+ADD, ADDA, ADDQ  
+SUB  
+LEA  
+AND,OR,NOT  
+LSL, LSR, ASL, ASR  
+ROL,ROR  
+Bcc (BGT, BLE, BEQ)  
+JSR, RTS  
+BRA  
 
 ## Supported EAs:
-Data Register Direct, Dn
-Address Register Direct, An
-Address Register Indirect, (An)
-Address Register Indirect Post-Increment, (An)+
-Address Register Indirect Pre-Decrement, -(An)
-Absolute Word Address,     (xxx).W
-Absolute Long Address, (xxx).L
-Immediate Addressing, #<data>
+Data Register Direct, Dn  
+Address Register Direct, An  
+Address Register Indirect, (An)  
+Address Register Indirect Post-Increment, (An)+  
+Address Register Indirect Pre-Decrement, -(An)  
+Absolute Word Address, (xxx).W  
+Absolute Long Address, (xxx).L  
+Immediate Addressing, #<data>  
 
 
