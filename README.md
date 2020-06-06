@@ -3,7 +3,7 @@
 * Scans a section of memory
 * Attempts to convertthe memory’s contents to a listing of valid assembly language instructions
 
-I/O
+## I/O
 * Prints the address of each instruction
 * Handles improper user inputs
 * Prints results as one screen at a time 
