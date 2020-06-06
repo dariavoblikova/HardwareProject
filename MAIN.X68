@@ -25,25 +25,26 @@ MAIN    ORG    $1000
     INCLUDE 'USERINPUT.X68'                 Get Adrresses AsciiToHex
     INCLUDE 'MAIN_LOOP.X68'                 Opcodes loop
     INCLUDE 'strings.X68'                   Put all the strings here and give them good names
-    INCLUDE 'INVALID.X68'
-    INCLUDE 'NOP_RTS_JSR.X68'             Decoding NOP, RTS, JSR opcodes
-    INCLUDE 'SHIFT_OPCODES.X68'
-    INCLUDE 'Bcc.X68'                         Decoding Branch Opcodes
-    INCLUDE 'REG_MEM.X68'  *caused errors, put in mainloop
-    INCLUDE 'MEM_REG.X68'  *caused errors, put in mainloop
-    INCLUDE 'IO.x68'
+    INCLUDE 'INVALID.X68'                   Setting D6 to 1 (invalid opcode)
+    INCLUDE 'NOP_RTS_JSR.X68'               Decoding NOP, RTS, JSR opcodes
+    INCLUDE 'SHIFT_OPCODES.X68'             Decoding LSL, LSR, ASL, ASR, ROL, ROR opcodes
+    INCLUDE 'Bcc.X68'                       Decoding Branch Opcodes
+    INCLUDE 'REG_MEM.X68'                   Decoding MOVEM for register to memory direction
+    INCLUDE 'MEM_REG.X68'                   Decoding MOVEM for memory to register direction
+    INCLUDE 'IO.x68'                        PRINTHEX, commonly used strings and subroutines
     INCLUDE 'ADD_SUBROUTINE.x68'
     INCLUDE 'MOVE_SUBROUTINE.x68'
     INCLUDE 'NOT.x68'
     INCLUDE 'LEA.x68'
     INCLUDE 'MOVEQ.x68'
-    INCLUDE 'INVALIDEA.X68'
+    INCLUDE 'INVALIDEA.X68'                 Setting D6 to B (invalid EA)
     
     
 LINECOUNTER      DS.B    1
 
 STOP    SIMHALT   
         END    MAIN                             ; last line of source
+
 
 
 
