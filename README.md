@@ -31,6 +31,6 @@ Address Register Indirect Post-Increment, (An)+
 Address Register Indirect Pre-Decrement, -(An)  
 Absolute Word Address, (xxx).W  
 Absolute Long Address, (xxx).L  
-Immediate Addressing, #<data>  
+Immediate Addressing, #\<data>  
 
 
