@@ -155,6 +155,10 @@ ERROR       LEA         DATA_STRING, A1             * data message
             LEA         TAB,A1                      * Print tab
             MOVE.B      #14,D0                      * Stores task 14 in D0
             TRAP        #15                         * Task 15, print tab
+            
+            LEA         MONEY, A1
+            MOVE.B      #14,D0
+            TRAP        #15
                         
             MOVE.L      D7,D1                       * Move current data(bad opcode) to D1 for printing
             MOVE.B      #16,D2                      * Base 16 for for trap 15 task 15
@@ -216,6 +220,7 @@ TAB           DC.B    '    ',0
 
 * STOP:
     * END    MAIN_LOOP                             ; last line of source
+
 
 
 
